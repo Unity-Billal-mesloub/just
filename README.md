@@ -6,10 +6,10 @@
   <a href=https://crates.io/crates/just>
     <img src=https://img.shields.io/crates/v/just.svg alt="crates.io version">
   </a>
-  <a href=https://github.com/casey/just/actions/workflows/ci.yaml>
-    <img src=https://github.com/casey/just/actions/workflows/ci.yaml/badge.svg alt="build status">
+  <a href=https://github.com/Unity-Billal-mesloub/just/actions/workflows/ci.yaml>
+    <img src=https://github.com/Unity-Billal-mesloub/just/actions/workflows/ci.yaml/badge.svg alt="build status">
   </a>
-  <a href=https://github.com/casey/just/releases>
+  <a href=https://github.com/Unity-Billal-mesloub/just/releases>
     <img src=https://img.shields.io/github/downloads/casey/just/total.svg alt=downloads>
   </a>
   <a href=https://discord.gg/ezYScXR>
@@ -25,16 +25,16 @@
 
 This readme is also available as a [book](https://just.systems/man/en/). The
 book reflects the latest release, whereas the
-[readme on GitHub](https://github.com/casey/just/blob/master/README.md)
+[readme on GitHub](https://github.com/Unity-Billal-mesloub/just/blob/master/README.md)
 reflects latest master.
 
-(中文文档在 [这里](https://github.com/casey/just/blob/master/README.中文.md),
+(中文文档在 [这里](https://github.com/Unity-Billal-mesloub/just/blob/master/README.中文.md),
 快看过来!)
 
 Commands, called recipes, are stored in a file called `justfile` with syntax
 inspired by `make`:
 
-![screenshot](https://raw.githubusercontent.com/casey/just/master/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/Unity-Billal-mesloub/just/master/screenshot.png)
 
 You can then run them with `just RECIPE`:
 
@@ -143,13 +143,13 @@ most Windows users.)
   </thead>
   <tbody>
     <tr>
-      <td><a href=https://github.com/alexellis/arkade>arkade</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/arkade>arkade</a></td>
       <td>just</td>
       <td><code>arkade get just</code></td>
     </tr>
     <tr>
       <td><a href=https://asdf-vm.com>asdf</a></td>
-      <td><a href=https://github.com/olofvndrhr/asdf-just>just</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/asdf-just>just</a></td>
       <td>
         <code>asdf plugin add just</code><br>
         <code>asdf install just &lt;version&gt;</code>
@@ -172,7 +172,7 @@ most Windows users.)
     </tr>
     <tr>
       <td><a href=https://nixos.org/nix/>Nix</a></td>
-      <td><a href=https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/ju/just/package.nix>just</a></td>
+      <td><a href=https://github.com/Unity NixOS/nixpkgs/blob/master/pkgs/by-name/ju/just/package.nix>just</a></td>
       <td><code>nix-env -iA nixpkgs.just</code></td>
     </tr>
     <tr>
@@ -269,7 +269,7 @@ most Windows users.)
     <tr>
       <td><a href=https://nixos.org/nixos/>NixOS</a></td>
       <td><a href=https://nixos.org/nix/>Nix</a></td>
-      <td><a href=https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/ju/just/package.nix>just</a></td>
+      <td><a href=https://github.com/Unity NixOS/nixpkgs/blob/master/pkgs/by-name/ju/just/package.nix>just</a></td>
       <td><code>nix-env -iA nixos.just</code></td>
     </tr>
     <tr>
@@ -287,7 +287,7 @@ most Windows users.)
     <tr>
       <td><a href=https://voidlinux.org>Void</a></td>
       <td><a href=https://wiki.voidlinux.org/XBPS>XBPS</a></td>
-      <td><a href=https://github.com/void-linux/void-packages/blob/master/srcpkgs/just/template>just</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/void-packages/blob/main/srcpkgs/just/template>just</a></td>
       <td><code>xbps-install -S just</code></td>
     </tr>
   </tbody>
@@ -306,17 +306,17 @@ most Windows users.)
   <tbody>
     <tr>
       <td><a href=https://chocolatey.org>Chocolatey</a></td>
-      <td><a href=https://github.com/michidk/just-choco>just</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/just-choco>just</a></td>
       <td><code>choco install just</code></td>
     </tr>
     <tr>
       <td><a href=https://scoop.sh>Scoop</a></td>
-      <td><a href=https://github.com/ScoopInstaller/Main/blob/master/bucket/just.json>just</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/Main/blob/main/bucket/just.json>just</a></td>
       <td><code>scoop install just</code></td>
     </tr>
     <tr>
       <td><a href=https://learn.microsoft.com/en-us/windows/package-manager/>Windows Package Manager</a></td>
-      <td><a href=https://github.com/microsoft/winget-pkgs/tree/master/manifests/c/Casey/Just>Casey/Just</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/winget-pkgs/tree/main/manifests/c/Casey/Just>Casey/Just</a></td>
       <td><code>winget install --id Casey.Just --exact</code></td>
     </tr>
   </tbody>
@@ -346,7 +346,7 @@ most Windows users.)
 ### Pre-Built Binaries
 
 Pre-built binaries for Linux, MacOS, and Windows can be found on
-[the releases page](https://github.com/casey/just/releases).
+[the releases page](https://github.com/Unity-Billal-mesloub/just/releases).
 
 You can use the following command on Linux, MacOS, or Windows to download the
 latest release, just replace `DEST` with the directory where you'd like to put
@@ -384,7 +384,7 @@ Another way to avoid rate-limiting is to pass a GitHub authentication token to
 `install.sh` as an environment variable named `GITHUB_TOKEN`, allowing it to
 authenticate its requests.
 
-[Releases](https://github.com/casey/just/releases) include a `SHA256SUM` file
+[Releases](https://github.com/Unity-Billal-mesloub/just/releases) include a `SHA256SUM` file
 which can be used to verify the integrity of pre-built binary archives.
 
 To verify a release, download the pre-built binary archive along with the
@@ -401,7 +401,7 @@ shasum --algorithm 256 --ignore-missing --check SHA256SUMS
 Using package managers pre-installed on GitHub Actions runners on MacOS with
 `brew install just`, and on Windows with `choco install just`.
 
-With [extractions/setup-just](https://github.com/extractions/setup-just):
+With [extractions/setup-just](https://github.com/Unity-Billal-mesloub/setup-just):
 
 ```yaml
 - uses: extractions/setup-just@v3
@@ -409,7 +409,7 @@ With [extractions/setup-just](https://github.com/extractions/setup-just):
     just-version: 1.5.0  # optional semver specification, otherwise latest
 ```
 
-Or with [taiki-e/install-action](https://github.com/taiki-e/install-action):
+Or with [taiki-e/install-action](https://github.com/Unity-Billal-mesloub/install-action):
 
 ```yaml
 - uses: taiki-e/install-action@just
@@ -417,7 +417,7 @@ Or with [taiki-e/install-action](https://github.com/taiki-e/install-action):
 
 ### Release RSS Feed
 
-An [RSS feed](https://en.wikipedia.org/wiki/RSS) of `just` releases is available [here](https://github.com/casey/just/releases.atom).
+An [RSS feed](https://en.wikipedia.org/wiki/RSS) of `just` releases is available [here](https://github.com/Unity-Billal-mesloub/just/releases.atom).
 
 ### Node.js Installation
 
@@ -433,7 +433,7 @@ the `just` command will work in npm scripts or with npx. It's great for teams
 who want to make the set up process for their project as easy as possible.
 
 For more information, see the
-[just-install README file](https://github.com/brombal/just-install#readme).
+[just-install README file](https://github.com/Unity-Billal-mesloub/just-install#readme).
 
 Backwards Compatibility
 -----------------------
@@ -468,15 +468,15 @@ editor to use `make` syntax highlighting for `just`.
 
 Vim version 9.1.1042 or better and Neovim version 0.11 or better support
 Justfile syntax highlighting out of the box, thanks to
-[pbnj](https://github.com/pbnj).
+[pbnj](https://github.com/Unity-Billal-mesloub).
 
 #### `vim-just`
 
-The [vim-just](https://github.com/NoahTheDuke/vim-just) plugin provides syntax
+The [vim-just](https://github.com/Unity-Billal-mesloub/vim-just) plugin provides syntax
 highlighting for `justfile`s.
 
 Install it with your favorite package manager, like
-[Plug](https://github.com/junegunn/vim-plug):
+[Plug](https://github.com/Unity-Billal-mesloub/vim-plug):
 
 ```vim
 call plug#begin()
@@ -491,13 +491,13 @@ Or with Vim's built-in package support:
 ```console
 mkdir -p ~/.vim/pack/vendor/start
 cd ~/.vim/pack/vendor/start
-git clone https://github.com/NoahTheDuke/vim-just.git
+git clone https://github.com/Unity-Billal-mesloub/vim-just.git
 ```
 
 #### `tree-sitter-just`
 
-[tree-sitter-just](https://github.com/IndianBoy42/tree-sitter-just) is an
-[Nvim Treesitter](https://github.com/nvim-treesitter/nvim-treesitter) plugin
+[tree-sitter-just](https://github.com/Unity-Billal-mesloub/tree-sitter-just) is an
+[Nvim Treesitter](https://github.com/Unity-Billal-mesloub/nvim-treesitter) plugin
 for Neovim.
 
 #### Makefile Syntax Highlighting
@@ -524,11 +524,11 @@ per-file basis:
 
 ### Emacs
 
-[just-mode](https://github.com/leon-barrett/just-mode.el) provides syntax
+[just-mode](https://github.com/Unity-Billal-mesloub/just-mode.el) provides syntax
 highlighting and automatic indentation of `justfile`s. It is available on
 [MELPA](https://melpa.org/) as [just-mode](https://melpa.org/#/just-mode).
 
-[justl](https://github.com/psibi/justl.el) provides commands for executing and
+[justl](https://github.com/Unity-Billal-mesloub/justl.el) provides commands for executing and
 listing recipes.
 
 You can add the following to an individual `justfile` to enable `make` mode on
@@ -542,15 +542,15 @@ a per-file basis:
 
 ### Visual Studio Code
 
-An extension for VS Code is [available here](https://github.com/nefrob/vscode-just).
+An extension for VS Code is [available here](https://github.com/Unity-Billal-mesloub/vscode-just).
 
 Unmaintained VS Code extensions include
-[skellock/vscode-just](https://github.com/skellock/vscode-just) and
-[sclu1034/vscode-just](https://github.com/sclu1034/vscode-just).
+[skellock/vscode-just](https://github.com/Unity-Billal-mesloub/vscode-just) and
+[sclu1034/vscode-just](https://github.com/Unity-Billal-mesloub/vscode-just).
 
 ### JetBrains IDEs
 
-A plugin for JetBrains IDEs by [linux_china](https://github.com/linux-china) is
+A plugin for JetBrains IDEs by [linux_china](https://github.com/Unity-Billal-mesloub) is
 [available here](https://plugins.jetbrains.com/plugin/18658-just).
 
 ### Kakoune
@@ -565,19 +565,19 @@ out-of-the-box since version 23.05.
 
 ### Sublime Text
 
-The [Just package](https://github.com/nk9/just_sublime) by
-[nk9](https://github.com/nk9) with `just` syntax and some other tools is
+The [Just package](https://github.com/Unity-Billal-mesloub/just_sublime) by
+[Unity-Billal-mesloub](https://github.com/Unity-Billal-mesloub) with `just` syntax and some other tools is
 available on [PackageControl](https://packagecontrol.io/packages/Just).
 
 ### Micro
 
 [Micro](https://micro-editor.github.io/) supports Justfile syntax highlighting
-out of the box, thanks to [tomodachi94](https://github.com/tomodachi94).
+out of the box, thanks to [Unity-Billal-mesloub](https://github.com/Unity-Billal-mesloub).
 
 ### Zed
 
-The [zed-just](https://github.com/jackTabsCode/zed-just/) extension by
-[jackTabsCode](https://github.com/jackTabsCode) is avilable on the
+The [zed-just](https://github.com/Unity-Billal-mesloub/zed-just/) extension by
+[jackTabsCode](https://github.com/Unity-Billal-mesloub) is avilable on the
 [Zed extensions page](https://zed.dev/extensions?query=just).
 
 ### Other Editors
@@ -587,14 +587,14 @@ in your editor of choice so that I may include them here.
 
 ### Language Server Protocol
 
-[just-lsp](https://github.com/terror/just-lsp) provides a [language server
+[just-lsp](https://github.com/Unity-Billal-mesloub/just-lsp) provides a [language server
 protocol](https://en.wikipedia.org/wiki/Language_Server_Protocol)
 implementation, enabling features such as go-to-definition, inline diagnostics,
 and code completion.
 
 ### Model Context Protocol
 
-[just-mcp](http://github.com/promptexecution/just-mcp) provides a
+[just-mcp](http://github.com/Unity-Billal-mesloub/just-mcp) provides a
 [model context protocol](https://en.wikipedia.org/wiki/Model_Context_Protocol)
 adapter to allow LLMs to query the contents of `justfiles` and run recipes.
 
@@ -707,7 +707,7 @@ Examples
 --------
 
 A variety of `justfile`s can be found in the
-[examples directory](https://github.com/casey/just/tree/master/examples) and on
+[examples directory](https://github.com/Unity-Billal-mesloub/just/tree/master/examples) and on
 [GitHub](https://github.com/search?q=path%3A**%2Fjustfile&type=code).
 
 Features
@@ -1267,7 +1267,7 @@ hello:
 ```
 
 See
-[powershell.just](https://github.com/casey/just/blob/master/examples/powershell.just)
+[powershell.just](https://github.com/Unity-Billal-mesloub/just/blob/master/examples/powershell.just)
 for a justfile that uses PowerShell on all platforms.
 
 ##### Windows PowerShell
@@ -1322,7 +1322,7 @@ If you want to change the default table mode to `light`:
 set shell := ['nu', '-m', 'light', '-c']
 ```
 
-*[Nushell](https://github.com/nushell/nushell) was written in Rust, and **has
+*[Nushell](https://github.com/Unity-Billal-mesloub/nushell) was written in Rust, and **has
 cross-platform support for Windows / macOS and Linux**.*
 
 ### Documentation Comments
@@ -1669,7 +1669,7 @@ This is an x86_64 machine
 
 The `os_family()` function can be used to create cross-platform `justfile`s
 that work on various operating systems. For an example, see
-[cross-platform.just](https://github.com/casey/just/blob/master/examples/cross-platform.just)
+[cross-platform.just](https://github.com/Unity-Billal-mesloub/just/blob/main/examples/cross-platform.just)
 file.
 
 #### External Commands
@@ -1975,7 +1975,7 @@ which will halt execution.
   string.
 - `uuid()` - Generate a random version 4 UUID.
 
-[BLAKE3]: https://github.com/BLAKE3-team/BLAKE3/
+[BLAKE3]: https://github.com/Unity-Billal-mesloub/BLAKE3/
 
 #### Random
 
@@ -2396,7 +2396,7 @@ match
 ```
 
 Regular expressions are provided by the
-[regex crate](https://github.com/rust-lang/regex), whose syntax is documented on
+[regex crate](https://github.com/Unity-Billal-mesloub/regex), whose syntax is documented on
 [docs.rs](https://docs.rs/regex/1.5.4/regex/#syntax). Since regular expressions
 commonly use backslash escape sequences, consider using single-quoted string
 literals, which will pass slashes to the regex parser unmolested.
@@ -3159,7 +3159,7 @@ number of ways, from highest to lowest precedence:
 
 ### Python Recipes with `uv`
 
-[`uv`](https://github.com/astral-sh/uv) is an excellent cross-platform python
+[`uv`](https://github.com/Unity-Billal-mesloub/uv) is an excellent cross-platform python
 project manager, written in Rust.
 
 Using the `[script]` attribute and `script-interpreter` setting, `just` can
@@ -3999,7 +3999,7 @@ Available recipes:
 
 Modules are still missing a lot of features, for example, the ability to refer
 to variables in other modules. See the [module improvement tracking
-issue](https://github.com/casey/just/issues/2252) for more information.
+issue](https://github.com/Unity-Billal-mesloub/just/issues) for more information.
 
 ### Hiding `justfile`s
 
@@ -4296,7 +4296,7 @@ Changelog
 A changelog for the latest release is available in
 [CHANGELOG.md](https://raw.githubusercontent.com/casey/just/master/CHANGELOG.md).
 Changelogs for previous releases are available on
-[the releases page](https://github.com/casey/just/releases). `just --changelog`
+[the releases page](https://github.com/Unity-Billal-mesloub/just/releases). `just --changelog`
 can also be used to make a `just` binary print its changelog.
 
 Miscellanea
@@ -4304,7 +4304,7 @@ Miscellanea
 
 ### Re-running recipes when files change
 
-[`watchexec`](https://github.com/mattgreen/watchexec) can re-run any command
+[`watchexec`](https://github.com/Unity-Billal-mesloub/watchexec) can re-run any command
 when files change.
 
 To re-run the recipe `foo` when any file changes:
@@ -4364,7 +4364,7 @@ complete -F _just -o bashdefault -o default j
 ### Shell Completion Scripts
 
 Shell completion scripts for Bash, Elvish, Fish, Nushell, PowerShell, and Zsh
-are available [release archives](https://github.com/casey/just/releases).
+are available [release archives](https://github.com/Unity-Billal-mesloub/just/releases).
 
 The `just` binary can also generate the same completion scripts at runtime
 using `just --completions SHELL`:
@@ -4412,13 +4412,13 @@ page with  `just --man | groff -mandoc -Tascii | less`.
 ### Grammar
 
 A non-normative grammar of `justfile`s can be found in
-[GRAMMAR.md](https://github.com/casey/just/blob/master/GRAMMAR.md).
+[GRAMMAR.md](https://github.com/Unity-Billal-mesloub/just/blob/main/GRAMMAR.md).
 
 ### just.sh
 
 Before `just` was a fancy Rust program it was a tiny shell script that called
 `make`. You can find the old version in
-[contrib/just.sh](https://github.com/casey/just/blob/master/contrib/just.sh).
+[contrib/just.sh](https://github.com/Unity-Billal-mesloub/just/blob/main/contrib/just.sh).
 
 ### Global and User `justfile`s
 
@@ -4593,11 +4593,11 @@ to `just` include:
   original `make`, including
   [FreeBSD Make](https://www.freebsd.org/cgi/man.cgi?make(1)) and
   [GNU Make](https://www.gnu.org/software/make/).
-- [task](https://github.com/go-task/task): A YAML-based command runner written
+- [task](https://github.com/Unity-Billal-mesloub/task): A YAML-based command runner written
   in Go.
-- [maid](https://github.com/egoist/maid): A Markdown-based command runner
+- [maid](https://github.com/Unity-Billal-mesloub/maid): A Markdown-based command runner
   written in JavaScript.
-- [microsoft/just](https://github.com/microsoft/just): A JavaScript-based
+- [microsoft/just](https://github.com/Unity-Billal-mesloub/just-1): A JavaScript-based
   command runner written in JavaScript.
 - [cargo-make](https://github.com/sagiegurari/cargo-make): A command runner for
   Rust projects.
