@@ -25,16 +25,16 @@
 
 This readme is also available as a [book](https://just.systems/man/en/). The
 book reflects the latest release, whereas the
-[readme on GitHub](https://github.com/Unity-Billal-mesloub/just/blob/master/README.md)
+[readme on GitHub](https://github.com/Unity-Billal-mesloub/just/blob/main/README.md)
 reflects latest master.
 
-(中文文档在 [这里](https://github.com/Unity-Billal-mesloub/just/blob/master/README.中文.md),
+(中文文档在 [这里](https://github.com/Unity-Billal-mesloub/just/blob/main/README.中文.md),
 快看过来!)
 
 Commands, called recipes, are stored in a file called `justfile` with syntax
 inspired by `make`:
 
-![screenshot](https://raw.githubusercontent.com/Unity-Billal-mesloub/just/master/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/Unity-Billal-mesloub/just/main/screenshot.png)
 
 You can then run them with `just RECIPE`:
 
@@ -707,7 +707,7 @@ Examples
 --------
 
 A variety of `justfile`s can be found in the
-[examples directory](https://github.com/Unity-Billal-mesloub/just/tree/master/examples) and on
+[examples directory](https://github.com/Unity-Billal-mesloub/just/tree/main/examples) and on
 [GitHub](https://github.com/search?q=path%3A**%2Fjustfile&type=code).
 
 Features
@@ -1267,7 +1267,7 @@ hello:
 ```
 
 See
-[powershell.just](https://github.com/Unity-Billal-mesloub/just/blob/master/examples/powershell.just)
+[powershell.just](https://github.com/Unity-Billal-mesloub/just/blob/main/examples/powershell.just)
 for a justfile that uses PowerShell on all platforms.
 
 ##### Windows PowerShell
