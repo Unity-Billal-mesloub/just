@@ -4599,17 +4599,17 @@ to `just` include:
   written in JavaScript.
 - [microsoft/just](https://github.com/Unity-Billal-mesloub/just-1): A JavaScript-based
   command runner written in JavaScript.
-- [cargo-make](https://github.com/sagiegurari/cargo-make): A command runner for
+- [cargo-make](https://github.com/Unity-Billal-mesloub/cargo-make): A command runner for
   Rust projects.
-- [mmake](https://github.com/tj/mmake): A wrapper around `make` with a number
+- [mmake](https://github.com/Unity-Billal-mesloub/mmake): A wrapper around `make` with a number
   of improvements, including remote includes.
-- [robo](https://github.com/tj/robo): A YAML-based command runner written in
+- [robo](https://github.com/Unity-Billal-mesloub/robo): A YAML-based command runner written in
   Go.
-- [mask](https://github.com/jakedeichert/mask): A Markdown-based command runner
+- [mask](https://github.com/Unity-Billal-mesloub/mask): A Markdown-based command runner
   written in Rust.
-- [makesure](https://github.com/xonixx/makesure): A simple and portable command
+- [makesure](https://github.com/Unity-Billal-mesloub/makesure): A simple and portable command
   runner written in AWK and shell.
-- [haku](https://github.com/VladimirMarkelov/haku): A make-like command runner
+- [haku](https://github.com/Unity-Billal-mesloub/haku): A make-like command runner
   written in Rust.
 - [mise](https://mise.jdx.dev/): A development environment tool manager written
   in Rust supporing tasks in TOML files and standalone scripts.
@@ -4630,9 +4630,9 @@ under this license.
 
 `just` is extensively tested. All new features must be covered by unit or
 integration tests. Unit tests are under
-[src](https://github.com/casey/just/blob/master/src), live alongside the code
+[src](https://github.com/Unity-Billal-mesloub/just/blob/main/src), live alongside the code
 being tested, and test code in isolation. Integration tests are in the [tests
-directory](https://github.com/casey/just/blob/master/tests) and test the `just`
+directory](https://github.com/Unity-Billal-mesloub/just/blob/main/tests) and test the `just`
 binary from the outside by invoking `just` on a given `justfile` and set of
 command-line arguments, and checking the output.
 
@@ -4642,7 +4642,7 @@ while still providing good test coverage.
 Unit tests are useful for testing new Rust functions that are used internally
 and as an aid for development. A good example are the unit tests which cover
 the
-[`unindent()` function](https://github.com/casey/just/blob/master/src/unindent.rs),
+[`unindent()` function](https://github.com/Unity-Billal-mesloub/just/blob/main/src/unindent.rs),
 used to unindent triple-quoted strings and backticks. `unindent()` has a bunch
 of tricky edge cases which are easy to exercise with unit tests that call
 `unindent()` directly.
@@ -4661,7 +4661,7 @@ and checking the program's stdout, stderr, and exit code .
 ### Contribution Workflow
 
 1. Make sure the feature is wanted. There should be an open issue about the
-   feature with a comment from [@casey](https://github.com/casey) saying that
+   feature with a comment from [@casey](https://github.com/Unity-Billal-mesloub) saying that
    it's a good idea or seems reasonable. If there isn't, open a new issue and
    ask for feedback.
 
@@ -4676,22 +4676,22 @@ and checking the program's stdout, stderr, and exit code .
 3. Clone `just` and start hacking. The best workflow is to have the code you're
    working on in an editor alongside a job that re-runs tests whenever a file
    changes. You can run such a job by installing
-   [cargo-watch](https://github.com/watchexec/cargo-watch) with `cargo install
+   [cargo-watch](https://github.com/Unity-Billal-mesloub/cargo-watch) with `cargo install
    cargo-watch` and running `just watch test`.
 
 4. Add a failing test for your feature. Most of the time this will be an
    integration test which exercises the feature end-to-end. Look for an
    appropriate file to put the test in in
-   [tests](https://github.com/casey/just/blob/master/tests), or add a new file
-   in [tests](https://github.com/casey/just/blob/master/tests) and add a `mod`
+   [tests](https://github.com/Unity-Billal-mesloub/just/blob/main/tests), or add a new file
+   in [tests](https://github.com/Unity-Billal-mesloub/just/blob/main/tests) and add a `mod`
    statement importing that file in
-   [tests/lib.rs](https://github.com/casey/just/blob/master/tests/lib.rs).
+   [tests/lib.rs](https://github.com/Unity-Billal-mesloub/just/blob/main/tests/lib.rs).
 
 5. Implement the feature.
 
 6. Run `just ci` to make sure that all tests, lints, and checks pass. Requires
-   [mdBook](https://github.com/rust-lang/mdBook) and
-   [mdbook-linkcheck](https://github.com/Michael-F-Bryan/mdbook-linkcheck).
+   [mdBook](https://github.com/Unity-Billal-mesloub/mdBook) and
+   [mdbook-linkcheck](https://github.com/Unity-Billal-mesloub/mdbook-linkcheck).
 
 7. Open a PR with the new code that is editable by maintainers. PRs often
    require rebasing and minor tweaks. If the PR is not editable by maintainers,
@@ -4712,10 +4712,10 @@ which you can use in addition to the contribution workflow above.
 #### Adding a New Attribute
 
 1. Write a new integration test in
-   [tests/attributes.rs](https://github.com/casey/just/blob/master/tests/attributes.rs).
+   [tests/attributes.rs](https://github.com/Unity-Billal-mesloub/just/blob/main/tests/attributes.rs).
 
 2. Add a new variant to the
-   [`Attribute`](https://github.com/casey/just/blob/master/src/attribute.rs)
+   [`Attribute`](https://github.com/Unity-Billal-mesloub/just/blob/main/src/attribute.rs)
    enum.
 
 3. Implement the functionality of the new attribute.
@@ -4724,7 +4724,7 @@ which you can use in addition to the contribution workflow above.
 
 ### Janus
 
-[Janus](https://github.com/casey/janus) is a tool for checking whether a change
+[Janus](https://github.com/Unity-Billal-mesloub/janus) is a tool for checking whether a change
 to `just` breaks or changes the interpretation of existing `justfile`s. It
 collects and analyzes public `justfile`s on GitHub.
 
@@ -4857,7 +4857,7 @@ you need to do are in the `justfile`, and that if you type `just` something
 useful (or at least interesting!) will probably happen.
 
 For ideas for recipes, check out
-[this project's `justfile`](https://github.com/casey/just/blob/master/justfile),
+[this project's `justfile`](https://github.com/Unity-Billal-mesloub/just/blob/main/justfile),
 or some of the
 `justfile`s
 [out in the wild](https://github.com/search?q=path%3A**%2Fjustfile&type=code).
