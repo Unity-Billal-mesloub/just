@@ -1,345 +1,482 @@
-↖️ 目录
+<div align=right>Table of Contents↗️</div>
 
-<h1 align="center"><code>just</code></h1>
+<h1 align=center><code>just</code></h1>
 
-<div align="center">
-  <a href="https://crates.io/crates/just">
-    <img src="https://img.shields.io/crates/v/just.svg" alt="crates.io version">
+<div align=center>
+  <a href=https://crates.io/crates/just>
+    <img src=https://img.shields.io/crates/v/just.svg alt="crates.io version">
   </a>
-  <a href="https://github.com/casey/just/actions">
-    <img src="https://github.com/casey/just/actions/workflows/ci.yaml/badge.svg" alt="build status">
+  <a href=https://github.com/Unity-Billal-mesloub/just/actions/workflows/ci.yaml>
+    <img src=https://github.com/Unity-Billal-mesloub/just/actions/workflows/ci.yaml/badge.svg alt="build status">
   </a>
-  <a href="https://github.com/casey/just/releases">
-    <img src="https://img.shields.io/github/downloads/casey/just/total.svg" alt="downloads">
+  <a href=https://github.com/Unity-Billal-mesloub/just/releases>
+    <img src=https://img.shields.io/github/downloads/casey/just/total.svg alt=downloads>
   </a>
-  <a href="https://discord.gg/ezYScXR">
-    <img src="https://img.shields.io/discord/695580069837406228?logo=discord" alt="chat on discord">
+  <a href=https://discord.gg/ezYScXR>
+    <img src=https://img.shields.io/discord/695580069837406228?logo=discord alt="chat on discord">
   </a>
-  <a href="mailto:casey@rodarmor.com?subject=Thanks%20for%20Just!">
-    <img src="https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg" alt="say thanks">
+  <a href=mailto:casey@rodarmor.com?subject=Thanks%20for%20Just!>
+    <img src=https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg alt="say thanks">
   </a>
 </div>
 <br>
 
-`just` 为您提供一种保存和运行项目特有命令的便捷方式。
+`just` is a handy way to save and run project-specific commands.
 
-本指南同时也可以以 [书](https://just.systems/man/zh/) 的形式提供在线阅读。
+This readme is also available as a [book](https://just.systems/man/en/). The
+book reflects the latest release, whereas the
+[readme on GitHub](https://github.com/Unity-Billal-mesloub/just/blob/main/README.md)
+reflects latest master.
 
-命令，在此也称为配方，存储在一个名为 `justfile` 的文件中，其语法受 `make` 启发：
+(中文文档在 [这里](https://github.com/Unity-Billal-mesloub/just/blob/main/README.中文.md),
+快看过来!)
 
-![screenshot](https://raw.githubusercontent.com/casey/just/master/screenshot.png)
+Commands, called recipes, are stored in a file called `justfile` with syntax
+inspired by `make`:
 
-然后你可以用 `just RECIPE` 运行它们：
+![screenshot](https://raw.githubusercontent.com/Unity-Billal-mesloub/just/main/screenshot.png)
 
-```sh
+You can then run them with `just RECIPE`:
+
+```console
 $ just test-all
 cc *.c -o main
 ./test --all
 Yay, all your tests passed!
 ```
 
-`just` 有很多很棒的特性，而且相比 `make` 有很多改进：
+`just` has a ton of useful features, and many improvements over `make`:
 
-- `just` 是一个命令运行器，而不是一个构建系统，所以它避免了许多 [`make` 的复杂性和特异性](#just-避免了-make-的哪些特异性)。不需要 `.PHONY` 配方!
+- `just` is a command runner, not a build system, so it avoids much of
+  [`make`'s complexity and idiosyncrasies](#what-are-the-idiosyncrasies-of-make-that-just-avoids).
+  No need for `.PHONY` recipes!
 
-- 支持 Linux、MacOS 和 Windows，而且无需额外的依赖。(尽管如果你的系统没有 `sh`，你需要 [选择一个不同的 Shell](#shell))。
+- Linux, MacOS, Windows, and other reasonable unices are supported with no
+  additional dependencies. (Although if your system doesn't have an `sh`,
+  you'll need to [choose a different shell](#shell).)
 
-- 错误具体且富有参考价值，语法错误将会与产生它们的上下文一起被报告。
+- Errors are specific and informative, and syntax errors are reported along
+  with their source context.
 
-- 配方可以接受 [命令行参数](#配方参数)。
+- Recipes can accept [command line arguments](#recipe-parameters).
 
-- 错误会尽可能被静态地解决。未知的配方和循环依赖关系会在运行之前被报告。
+- Wherever possible, errors are resolved statically. Unknown recipes and
+  circular dependencies are reported before anything runs.
 
-- `just` 可以 [加载`.env`文件](#环境变量加载)，简化环境变量注入。
+- `just` [loads `.env` files](#dotenv-settings), making it easy to populate
+  environment variables.
 
-- 配方可以在 [命令行中列出](#列出可用的配方)。
+- Recipes can be [listed from the command line](#listing-available-recipes).
 
-- 命令行自动补全脚本 [支持大多数流行的 Shell](#shell-自动补全脚本)。
+- Command line completion scripts are
+  [available for most popular shells](#shell-completion-scripts).
 
-- 配方可以用 [任意语言](#用其他语言书写配方) 编写，如 Python 或 NodeJS。
+- Recipes can be written in
+  [arbitrary languages](#shebang-recipes), like Python or NodeJS.
 
-- `just` 可以从任何子目录中调用，而不仅仅是包含 `justfile` 的目录。
+- `just` can be invoked from any subdirectory, not just the directory that
+  contains the `justfile`.
 
-- 不仅如此，还有 [更多](https://just.systems/man/zh/)！
+- And [much more](https://just.systems/man/en/)!
 
-如果你在使用 `just` 方面需要帮助，请随时创建一个 Issue 或在 [Discord](https://discord.gg/ezYScXR) 上与我联系。我们随时欢迎功能请求和错误报告！
+If you need help with `just` please feel free to open an issue or ping me on
+[Discord](https://discord.gg/ezYScXR). Feature requests and bug reports are
+always welcome!
 
-安装
+Installation
 ------------
 
-### 预备知识
+### Prerequisites
 
-`just` 应该可以在任何有合适的 `sh` 的系统上运行，包括 Linux、MacOS 和 BSD。
+`just` should run on any system with a reasonable `sh`, including Linux, MacOS,
+and the BSDs.
 
-在 Windows 上，`just` 可以使用 [Git for Windows](https://git-scm.com)、[GitHub Desktop](https://desktop.github.com) 或 [Cygwin](http://www.cygwin.com) 所提供的 `sh`。
+#### Windows
 
-如果你不愿意安装 `sh`，也可以使用 `shell` 设置来指定你要使用的 Shell。
+On Windows, `just` works with the `sh` provided by
+[Git for Windows](https://git-scm.com),
+[GitHub Desktop](https://desktop.github.com), or
+[Cygwin](http://www.cygwin.com). After installation, `sh` must be available in
+the `PATH` of the shell you want to invoke `just` from.
 
-比如 PowerShell：
+If you'd rather not install `sh`, you can use the `shell` setting to use the
+shell of your choice.
+
+Like PowerShell:
 
 ```just
-# 使用 PowerShell 替代 sh:
+# use PowerShell instead of sh:
 set shell := ["powershell.exe", "-c"]
 
 hello:
   Write-Host "Hello, world!"
 ```
 
-…或者 `cmd.exe`:
+…or `cmd.exe`:
 
 ```just
-# 使用 cmd.exe 替代 sh:
+# use cmd.exe instead of sh:
 set shell := ["cmd.exe", "/c"]
 
 list:
   dir
 ```
 
-你也可以使用命令行参数来设置 Shell。例如，若要使用 PowerShell 也可以用 `--shell powershell.exe --shell-arg -c` 启动`just`。
+You can also set the shell using command-line arguments. For example, to use
+PowerShell, launch `just` with `--shell powershell.exe --shell-arg -c`.
 
-(PowerShell 默认安装在 Windows 7 SP1 和 Windows Server 2008 R2 S1 及更高版本上，而 `cmd.exe` 相当麻烦，所以 PowerShell 被推荐给大多数 Windows 用户)
+(PowerShell is installed by default on Windows 7 SP1 and Windows Server 2008 R2
+S1 and later, and `cmd.exe` is quite fiddly, so PowerShell is recommended for
+most Windows users.)
 
-### 安装包
+### Packages
+
+#### Cross-platform
 
 <table>
   <thead>
     <tr>
-      <th>操作系统</th>
-      <th>包管理器</th>
-      <th>安装包</th>
-      <th>命令</th>
+      <th>Package Manager</th>
+      <th>Package</th>
+      <th>Command</th>
     </tr>
   </thead>
   <tbody>
-  <tr>
-    <td><a href="https://forge.rust-lang.org/release/platform-support.html">Various</a></td>
-    <td><a href="https://www.rust-lang.org">Cargo</a></td>
-    <td><a href="https://crates.io/crates/just">just</a></td>
-    <td><code>cargo install just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://en.wikipedia.org/wiki/Microsoft_Windows">Microsoft Windows</a></td>
-    <td><a href="https://scoop.sh">Scoop</a></td>
-    <td><a href="https://github.com/ScoopInstaller/Main/blob/master/bucket/just.json">just</a></td>
-    <td><code>scoop install just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://docs.brew.sh/Installation">Various</a></td>
-    <td><a href="https://brew.sh">Homebrew</a></td>
-    <td><a href="https://formulae.brew.sh/formula/just">just</a></td>
-    <td><code>brew install just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://en.wikipedia.org/wiki/MacOS">macOS</a></td>
-    <td><a href="https://www.macports.org">MacPorts</a></td>
-    <td><a href="https://ports.macports.org/port/just/summary">just</a></td>
-    <td><code>port install just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://www.archlinux.org">Arch Linux</a></td>
-    <td><a href="https://wiki.archlinux.org/title/Pacman">pacman</a></td>
-    <td><a href="https://archlinux.org/packages/community/x86_64/just/">just</a></td>
-    <td><code>pacman -S just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://nixos.org/download.html#download-nix">Various</a></td>
-    <td><a href="https://nixos.org/nix/">Nix</a></td>
-    <td><a href="https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/ju/just/package.nix">just</a></td>
-    <td><code>nix-env -iA nixpkgs.just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://nixos.org/nixos/">NixOS</a></td>
-    <td><a href="https://nixos.org/nix/">Nix</a></td>
-    <td><a href="https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/ju/just/package.nix">just</a></td>
-    <td><code>nix-env -iA nixos.just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://getsol.us">Solus</a></td>
-    <td><a href="https://getsol.us/articles/package-management/basics/en">eopkg</a></td>
-    <td><a href="https://dev.getsol.us/source/just/">just</a></td>
-    <td><code>eopkg install just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://voidlinux.org">Void Linux</a></td>
-    <td><a href="https://wiki.voidlinux.org/XBPS">XBPS</a></td>
-    <td><a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/just/template">just</a></td>
-    <td><code>xbps-install -S just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://www.freebsd.org">FreeBSD</a></td>
-    <td><a href="https://www.freebsd.org/doc/handbook/pkgng-intro.html">pkg</a></td>
-    <td><a href="https://www.freshports.org/deskutils/just/">just</a></td>
-    <td><code>pkg install just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://alpinelinux.org">Alpine Linux</a></td>
-    <td><a href="https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management">apk-tools</a></td>
-    <td><a href="https://pkgs.alpinelinux.org/package/edge/community/x86_64/just">just</a></td>
-    <td><code>apk add just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://getfedora.org">Fedora Linux</a></td>
-    <td><a href="https://dnf.readthedocs.io/en/latest/">DNF</a></td>
-    <td><a href="https://src.fedoraproject.org/rpms/rust-just">just</a></td>
-    <td><code>dnf install just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://www.gentoo.org">Gentoo Linux</a></td>
-    <td><a href="https://wiki.gentoo.org/wiki/Portage">Portage</a></td>
-    <td><a href="https://github.com/gentoo-mirror/guru/tree/master/sys-devel/just">guru/sys-devel/just</a></td>
-    <td>
-      <code>eselect repository enable guru</code><br>
-      <code>emerge --sync guru</code><br>
-      <code>emerge sys-devel/just</code>
-    </td>
-  </tr>
-  <tr>
-    <td><a href="https://docs.conda.io/en/latest/miniconda.html#system-requirements">Various</a></td>
-    <td><a href="https://docs.conda.io/projects/conda/en/latest/index.html">Conda</a></td>
-    <td><a href="https://anaconda.org/conda-forge/just">just</a></td>
-    <td><code>conda install -c conda-forge just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://en.wikipedia.org/wiki/Microsoft_Windows">Microsoft Windows</a></td>
-    <td><a href="https://chocolatey.org">Chocolatey</a></td>
-    <td><a href="https://github.com/michidk/just-choco">just</a></td>
-    <td><code>choco install just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://snapcraft.io/docs/installing-snapd">Various</a></td>
-    <td><a href="https://snapcraft.io">Snap</a></td>
-    <td><a href="https://snapcraft.io/just">just</a></td>
-    <td><code>snap install --edge --classic just</code></td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/casey/just/releases">Various</a></td>
-    <td><a href="https://asdf-vm.com">asdf</a></td>
-    <td><a href="https://github.com/olofvndrhr/asdf-just">just</a></td>
-    <td>
-      <code>asdf plugin add just</code><br>
-      <code>asdf install just &lt;version&gt;</code>
-    </td>
-  </tr>
-  <tr>
-    <td><a href="https://packaging.python.org/tutorials/installing-packages">Various</a></td>
-    <td><a href="https://pypi.org">PyPI</a></td>
-    <td><a href="https://pypi.org/project/rust-just">rust-just</a></td>
-    <td>
-      <code>pipx install rust-just</code><br>
-    </td>
-  </tr>
-  <tr>
-    <td><a href="https://docs.npmjs.com/packages-and-modules/getting-packages-from-the-registry">Various</a></td>
-    <td><a href="https://www.npmjs.com">npm</a></td>
-    <td><a href="https://www.npmjs.com/package/rust-just">rust-just</a></td>
-    <td>
-      <code>npm install -g rust-just</code><br>
-    </td>
-  </tr>
-  <tr>
-    <td><a href="https://debian.org">Debian</a> and <a href="https://ubuntu.com">Ubuntu</a> derivatives</td>
-    <td><a href="https://mpr.makedeb.org">MPR</a></td>
-    <td><a href="https://mpr.makedeb.org/packages/just">just</a></td>
-    <td>
-      <code>git clone 'https://mpr.makedeb.org/just'</code><br>
-      <code>cd just</code><br>
-      <code>makedeb -si</code>
-    </td>
-  </tr>
-  <tr>
-    <td><a href="https://debian.org">Debian</a> and <a href="https://ubuntu.com">Ubuntu</a> derivatives</td>
-    <td><a href="https://docs.makedeb.org/prebuilt-mpr">Prebuilt-MPR</a></td>
-    <td><a href="https://mpr.makedeb.org/packages/just">just</a></td>
-    <td>
-      <sup><b>You must have the <a href="https://docs.makedeb.org/prebuilt-mpr/getting-started/#setting-up-the-repository">Prebuilt-MPR set up</a> on your system in order to run this command.</b></sup><br>
-      <code>sudo apt install just</code>
-    </td>
-  </tr>
+    <tr>
+      <td><a href=https://github.com/Unity-Billal-mesloub/arkade>arkade</a></td>
+      <td>just</td>
+      <td><code>arkade get just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://asdf-vm.com>asdf</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/asdf-just>just</a></td>
+      <td>
+        <code>asdf plugin add just</code><br>
+        <code>asdf install just &lt;version&gt;</code>
+      </td>
+    </tr>
+    <tr>
+      <td><a href=https://www.rust-lang.org>Cargo</a></td>
+      <td><a href=https://crates.io/crates/just>just</a></td>
+      <td><code>cargo install just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://docs.conda.io/projects/conda/en/latest/index.html>Conda</a></td>
+      <td><a href=https://anaconda.org/conda-forge/just>just</a></td>
+      <td><code>conda install -c conda-forge just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://brew.sh>Homebrew</a></td>
+      <td><a href=https://formulae.brew.sh/formula/just>just</a></td>
+      <td><code>brew install just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://nixos.org/nix/>Nix</a></td>
+      <td><a href=https://github.com/Unity NixOS/nixpkgs/blob/master/pkgs/by-name/ju/just/package.nix>just</a></td>
+      <td><code>nix-env -iA nixpkgs.just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://www.npmjs.com/>npm</a></td>
+      <td><a href=https://www.npmjs.com/package/rust-just>rust-just</a></td>
+      <td><code>npm install -g rust-just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://pipx.pypa.io/stable/>pipx</a></td>
+      <td><a href=https://pypi.org/project/rust-just/>rust-just</a></td>
+      <td><code>pipx install rust-just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://snapcraft.io>Snap</a></td>
+      <td><a href=https://snapcraft.io/just>just</a></td>
+      <td><code>snap install --edge --classic just</code></td>
+    </tr>
   </tbody>
 </table>
 
-![package version table](https://repology.org/badge/vertical-allrepos/just.svg)
+#### BSD
 
-### 预制二进制文件
+<table>
+  <thead>
+    <tr>
+      <th>Operating System</th>
+      <th>Package Manager</th>
+      <th>Package</th>
+      <th>Command</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href=https://www.freebsd.org>FreeBSD</a></td>
+      <td><a href=https://www.freebsd.org/doc/handbook/pkgng-intro.html>pkg</a></td>
+      <td><a href=https://www.freshports.org/deskutils/just/>just</a></td>
+      <td><code>pkg install just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://www.openbsd.org>OpenBSD</a></td>
+      <td><a href=https://www.openbsd.org/faq/faq15.html>pkg_*</a></td>
+      <td><a href=https://cvsweb.openbsd.org/cgi-bin/cvsweb/ports/sysutils/just>just</a></td>
+      <td><code>pkg_add just</code></td>
+    </tr>
+  </tbody>
+</table>
 
-Linux、MacOS 和 Windows 的预制二进制文件可以在 [发布页](https://github.com/casey/just/releases) 上找到。
+#### Linux
 
-你也可以在 Linux、MacOS 或 Windows 上使用下面的命令来下载最新的版本，只需将 `DEST` 替换为你想安装 `just` 的目录即可：
+<table>
+  <thead>
+    <tr>
+      <th>Operating System</th>
+      <th>Package Manager</th>
+      <th>Package</th>
+      <th>Command</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href=https://alpinelinux.org>Alpine</a></td>
+      <td><a href=https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management>apk-tools</a></td>
+      <td><a href=https://pkgs.alpinelinux.org/package/edge/community/x86_64/just>just</a></td>
+      <td><code>apk add just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://www.archlinux.org>Arch</a></td>
+      <td><a href=https://wiki.archlinux.org/title/Pacman>pacman</a></td>
+      <td><a href=https://archlinux.org/packages/extra/x86_64/just/>just</a></td>
+      <td><code>pacman -S just</code></td>
+    </tr>
+    <tr>
+      <td>
+        <a href=https://debian.org>Debian 13</a> and
+        <a href=https://ubuntu.com>Ubuntu 24.04</a> derivatives</td>
+      <td><a href=https://en.wikipedia.org/wiki/APT_(software)>apt</a></td>
+      <td><a href=https://packages.debian.org/trixie/just>just</a></td>
+      <td><code>apt install just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://getfedora.org>Fedora</a></td>
+      <td><a href=https://dnf.readthedocs.io/en/latest/>DNF</a></td>
+      <td><a href=https://src.fedoraproject.org/rpms/rust-just>just</a></td>
+      <td><code>dnf install just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://www.gentoo.org>Gentoo</a></td>
+      <td><a href=https://wiki.gentoo.org/wiki/Portage>Portage</a></td>
+      <td><a href=https://packages.gentoo.org/packages/dev-build/just>dev-build/just</a></td>
+      <td>
+        <code>emerge -av dev-build/just</code>
+      </td>
+    </tr>
+    <tr>
+      <td><a href=https://nixos.org/nixos/>NixOS</a></td>
+      <td><a href=https://nixos.org/nix/>Nix</a></td>
+      <td><a href=https://github.com/Unity NixOS/nixpkgs/blob/master/pkgs/by-name/ju/just/package.nix>just</a></td>
+      <td><code>nix-env -iA nixos.just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://opensuse.org>openSUSE</a></td>
+      <td><a href=https://en.opensuse.org/Portal:Zypper>Zypper</a></td>
+      <td><a href=https://build.opensuse.org/package/show/Base:System/just>just</a></td>
+      <td><code>zypper in just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://getsol.us>Solus</a></td>
+      <td><a href=https://getsol.us/articles/package-management/basics/en>eopkg</a></td>
+      <td><a href=https://dev.getsol.us/source/just/>just</a></td>
+      <td><code>eopkg install just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://voidlinux.org>Void</a></td>
+      <td><a href=https://wiki.voidlinux.org/XBPS>XBPS</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/void-packages/blob/main/srcpkgs/just/template>just</a></td>
+      <td><code>xbps-install -S just</code></td>
+    </tr>
+  </tbody>
+</table>
 
-```sh
+#### Windows
+
+<table>
+  <thead>
+    <tr>
+      <th>Package Manager</th>
+      <th>Package</th>
+      <th>Command</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href=https://chocolatey.org>Chocolatey</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/just-choco>just</a></td>
+      <td><code>choco install just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://scoop.sh>Scoop</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/Main/blob/main/bucket/just.json>just</a></td>
+      <td><code>scoop install just</code></td>
+    </tr>
+    <tr>
+      <td><a href=https://learn.microsoft.com/en-us/windows/package-manager/>Windows Package Manager</a></td>
+      <td><a href=https://github.com/Unity-Billal-mesloub/winget-pkgs/tree/main/manifests/c/Casey/Just>Casey/Just</a></td>
+      <td><code>winget install --id Casey.Just --exact</code></td>
+    </tr>
+  </tbody>
+</table>
+
+#### macOS
+
+<table>
+  <thead>
+    <tr>
+      <th>Package Manager</th>
+      <th>Package</th>
+      <th>Command</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href=https://www.macports.org>MacPorts</a></td>
+      <td><a href=https://ports.macports.org/port/just/summary>just</a></td>
+      <td><code>port install just</code></td>
+    </tr>
+  </tbody>
+</table>
+
+![just package version table](https://repology.org/badge/vertical-allrepos/just.svg)
+
+### Pre-Built Binaries
+
+Pre-built binaries for Linux, MacOS, and Windows can be found on
+[the releases page](https://github.com/Unity-Billal-mesloub/just/releases).
+
+You can use the following command on Linux, MacOS, or Windows to download the
+latest release, just replace `DEST` with the directory where you'd like to put
+`just`:
+
+```console
 curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to DEST
 ```
 
-例如，安装 `just` 到 `~/bin` 目录：
+For example, to install `just` to `~/bin`:
 
-```sh
-# 创建 ~/bin
+```console
+# create ~/bin
 mkdir -p ~/bin
 
-# 下载并解压 just 到 ~/bin/just
+# download and extract just to ~/bin/just
 curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/bin
 
-# 在 Shell 搜索可执行文件的路径中添加`~/bin`
-# 这一行应该被添加到你的 Shell 初始化文件中，e.g. `~/.bashrc` 或者 `~/.zshrc`：
+# add `~/bin` to the paths that your shell searches for executables
+# this line should be added to your shells initialization file,
+# e.g. `~/.bashrc` or `~/.zshrc`
 export PATH="$PATH:$HOME/bin"
 
-# 现在 just 应该就可以执行了
+# just should now be executable
 just --help
+```
+
+Note that `install.sh` may fail on GitHub Actions, or in other environments
+where many machines share IP addresses. `install.sh` calls GitHub APIs in order
+to determine the latest version of `just` to install, and those API calls are
+rate-limited on a per-IP basis. To make `install.sh` more reliable in such
+circumstances, pass a specific tag to install with `--tag`.
+
+Another way to avoid rate-limiting is to pass a GitHub authentication token to
+`install.sh` as an environment variable named `GITHUB_TOKEN`, allowing it to
+authenticate its requests.
+
+[Releases](https://github.com/Unity-Billal-mesloub/just/releases) include a `SHA256SUM` file
+which can be used to verify the integrity of pre-built binary archives.
+
+To verify a release, download the pre-built binary archive along with the
+`SHA256SUM` file and run:
+
+```sh
+shasum --algorithm 256 --ignore-missing --check SHA256SUMS
 ```
 
 ### GitHub Actions
 
-使用 [extractions/setup-just](https://github.com/extractions/setup-just):
+`just` can be installed on GitHub Actions in a few ways.
+
+Using package managers pre-installed on GitHub Actions runners on MacOS with
+`brew install just`, and on Windows with `choco install just`.
+
+With [extractions/setup-just](https://github.com/Unity-Billal-mesloub/setup-just):
 
 ```yaml
-- uses: extractions/setup-just@v1
+- uses: extractions/setup-just@v3
   with:
-    just-version: 0.8 # optional semver specification, otherwise latest
+    just-version: 1.5.0  # optional semver specification, otherwise latest
 ```
 
-使用 [taiki-e/install-action](https://github.com/taiki-e/install-action):
+Or with [taiki-e/install-action](https://github.com/Unity-Billal-mesloub/install-action):
 
 ```yaml
 - uses: taiki-e/install-action@just
 ```
 
-### 发布 RSS 订阅
+### Release RSS Feed
 
-`just` 的发布 [RSS 订阅](https://en.wikipedia.org/wiki/RSS) 可以在 [这里](https://github.com/casey/just/releases.atom) 找到。
+An [RSS feed](https://en.wikipedia.org/wiki/RSS) of `just` releases is available [here](https://github.com/Unity-Billal-mesloub/just/releases.atom).
 
-### Node.js 安装
+### Node.js Installation
 
-[just-install](https://npmjs.com/package/just-install) 可用于在 Node.js 应用程序中自动安装 `just`。
+[just-install](https://npmjs.com/package/just-install) can be used to automate
+installation of `just` in Node.js applications.
 
-`just` 是一个很赞的比 npm 脚本更强大的替代品。如果你想在 Node.js 应用程序的依赖中包含 `just`，可以通过 `just-install`，它将在本机安装一个针对特定平台的二进制文件作为 `npm install` 安装结果的一部分。这样就不需要每个开发者使用上述提到的步骤独立安装 `just`。安装后，`just` 命令将在 npm 脚本或 npx 中工作。这对那些想让项目的设置过程尽可能简单的团队来说是很有用的。
+`just` is a great, more robust alternative to npm scripts. If you want to
+include `just` in the dependencies of a Node.js application, `just-install`
+will install a local, platform-specific binary as part of the `npm install`
+command. This removes the need for every developer to install `just`
+independently using one of the processes mentioned above. After installation,
+the `just` command will work in npm scripts or with npx. It's great for teams
+who want to make the set up process for their project as easy as possible.
 
-想了解更多信息, 请查看 [just-install 说明文件](https://github.com/brombal/just-install#readme)。
+For more information, see the
+[just-install README file](https://github.com/Unity-Billal-mesloub/just-install#readme).
 
-向后兼容性
+Backwards Compatibility
 -----------------------
 
-随着 1.0 版本的发布，`just` 突出对向后兼容性和稳定性的强烈承诺。
+With the release of version 1.0, `just` features a strong commitment to
+backwards compatibility and stability.
 
-未来的版本将不会引入向后不兼容的变化，不会使现有的 `justfile` 停止工作，或破坏命令行界面的正常调用。
+Future releases will not introduce backwards incompatible changes that make
+existing `justfile`s stop working, or break working invocations of the
+command-line interface.
 
-然而，这并不排除修复全面的错误，即使这样做可能会破坏依赖其行为的 `justfiles`。
+This does not, however, preclude fixing outright bugs, even if doing so might
+break `justfiles` that rely on their behavior.
 
-永远不会有一个 `just` 2.0。任何理想的向后兼容的变化都是在每个 `justfile` 的基础上选择性加入的，所以用户可以在他们的闲暇时间进行迁移。
+There will never be a `just` 2.0. Any desirable backwards-incompatible changes
+will be opt-in on a per-`justfile` basis, so users may migrate at their
+leisure.
 
-还没有准备好稳定化的功能将在 `--unstable` 标志后被选择性启用。由 `--unstable` 启用的功能可能会在任何时候以不兼容的方式发生变化。
+Features that aren't yet ready for stabilization are marked as unstable and may
+be changed or removed at any time. Using unstable features produces an error by
+default, which can be suppressed with by passing the `--unstable` flag,
+`set unstable`, or setting the environment variable `JUST_UNSTABLE`, to any
+value other than `false`, `0`, or the empty string.
 
-编辑器支持
+Editor Support
 --------------
 
-`justfile` 的语法与 `make` 非常接近，你可以让你的编辑器对 `just` 使用 `make` 语法高亮。
+`justfile` syntax is close enough to `make` that you may want to tell your
+editor to use `make` syntax highlighting for `just`.
 
-### Vim 和 Neovim
+### Vim and Neovim
+
+Vim version 9.1.1042 or better and Neovim version 0.11 or better support
+Justfile syntax highlighting out of the box, thanks to
+[pbnj](https://github.com/Unity-Billal-mesloub).
 
 #### `vim-just`
 
-[vim-just](https://github.com/NoahTheDuke/vim-just) 插件可以为 vim 提供 `justfile` 语法高亮显示。
+The [vim-just](https://github.com/Unity-Billal-mesloub/vim-just) plugin provides syntax
+highlighting for `justfile`s.
 
-你可以用你喜欢的软件包管理器安装它，如 [Plug](https://github.com/junegunn/vim-plug)：
+Install it with your favorite package manager, like
+[Plug](https://github.com/Unity-Billal-mesloub/vim-plug):
 
 ```vim
 call plug#begin()
@@ -349,21 +486,24 @@ Plug 'NoahTheDuke/vim-just'
 call plug#end()
 ```
 
-或者使用 Vim 的内置包支持：
+Or with Vim's built-in package support:
 
-```sh
+```console
 mkdir -p ~/.vim/pack/vendor/start
 cd ~/.vim/pack/vendor/start
-git clone https://github.com/NoahTheDuke/vim-just.git
+git clone https://github.com/Unity-Billal-mesloub/vim-just.git
 ```
 
 #### `tree-sitter-just`
 
-[tree-sitter-just](https://github.com/IndianBoy42/tree-sitter-just) 是一个针对 Neovim 的 [Nvim Treesitter](https://github.com/nvim-treesitter/nvim-treesitter) 插件。
+[tree-sitter-just](https://github.com/Unity-Billal-mesloub/tree-sitter-just) is an
+[Nvim Treesitter](https://github.com/Unity-Billal-mesloub/nvim-treesitter) plugin
+for Neovim.
 
-#### Makefile 语法高亮
+#### Makefile Syntax Highlighting
 
-Vim 内置的 makefile 语法高亮对 `justfile` 来说并不完美，但总比没有好。你可以把以下内容放在 `~/.vim/filetype.vim` 中：
+Vim's built-in makefile syntax highlighting isn't perfect for `justfile`s, but
+it's better than nothing. You can put the following in `~/.vim/filetype.vim`:
 
 ```vimscript
 if exists("did_load_filetypes")
@@ -374,7 +514,9 @@ augroup filetypedetect
   au BufNewFile,BufRead justfile setf make
 augroup END
 ```
-或者在单个 `justfile` 中添加以下内容，以在每个文件的基础上启用 `make` 模式：
+
+Or add the following to an individual `justfile` to enable `make` mode on a
+per-file basis:
 
 ```text
 # vim: set ft=make :
@@ -382,11 +524,15 @@ augroup END
 
 ### Emacs
 
-[just-mode](https://github.com/leon-barrett/just-mode.el) 可以为 `justfile` 提供语法高亮和自动缩进。它可以在 [MELPA](https://melpa.org/) 上通过 [just-mode](https://melpa.org/#/just-mode) 获得。
+[just-mode](https://github.com/Unity-Billal-mesloub/just-mode.el) provides syntax
+highlighting and automatic indentation of `justfile`s. It is available on
+[MELPA](https://melpa.org/) as [just-mode](https://melpa.org/#/just-mode).
 
-[justl](https://github.com/psibi/justl.el) 提供了执行和列出配方的命令。
+[justl](https://github.com/Unity-Billal-mesloub/justl.el) provides commands for executing and
+listing recipes.
 
-你可以在一个单独的 `justfile` 中添加以下内容，以便对每个文件启用 `make` 模式：
+You can add the following to an individual `justfile` to enable `make` mode on
+a per-file basis:
 
 ```text
 # Local Variables:
@@ -396,81 +542,121 @@ augroup END
 
 ### Visual Studio Code
 
-由 [skellock](https://github.com/skellock) 为 VS Code 提供的扩展 [可在此获得](https://marketplace.visualstudio.com/items?itemName=skellock.just)（[仓库](https://github.com/skellock/vscode-just)），但是开发已经不活跃了。
+An extension for VS Code is [available here](https://github.com/Unity-Billal-mesloub/vscode-just).
 
-你可以通过运行以下命令来安装它：
-
-```sh
-code --install-extension skellock.just
-```
-
-最近由 [sclu1034](https://github.com/sclu1034) 提供的一个更活跃的分叉可以在 [这里](https://github.com/sclu1034/vscode-just) 找到。
+Unmaintained VS Code extensions include
+[skellock/vscode-just](https://github.com/Unity-Billal-mesloub/vscode-just) and
+[sclu1034/vscode-just](https://github.com/Unity-Billal-mesloub/vscode-just).
 
 ### JetBrains IDEs
 
-由 [linux_china](https://github.com/linux-china) 为 JetBrains IDEs 提供的插件可 [由此获得](https://plugins.jetbrains.com/plugin/18658-just)。
+A plugin for JetBrains IDEs by [linux_china](https://github.com/Unity-Billal-mesloub) is
+[available here](https://plugins.jetbrains.com/plugin/18658-just).
 
 ### Kakoune
 
-Kakoune 已经内置支持 `justfile` 语法高亮，这要感谢 TeddyDD。
+Kakoune supports `justfile` syntax highlighting out of the box, thanks to
+TeddyDD.
+
+### Helix
+
+[Helix](https://helix-editor.com/) supports `justfile` syntax highlighting
+out-of-the-box since version 23.05.
 
 ### Sublime Text
 
-由 [nk9](https://github.com/nk9) 提供的 [Just 包](https://github.com/nk9/just_sublime) 支持 `just` 语法高亮，同时还有其它工具，这些可以在 [PackageControl](https://packagecontrol.io/packages/Just) 上找到。
+The [Just package](https://github.com/Unity-Billal-mesloub/just_sublime) by
+[Unity-Billal-mesloub](https://github.com/Unity-Billal-mesloub) with `just` syntax and some other tools is
+available on [PackageControl](https://packagecontrol.io/packages/Just).
 
-### 其它编辑器
+### Micro
 
-欢迎给我发送必要的命令，以便在你选择的编辑器中实现语法高亮，这样我就可以把它们放在这里。
+[Micro](https://micro-editor.github.io/) supports Justfile syntax highlighting
+out of the box, thanks to [Unity-Billal-mesloub](https://github.com/Unity-Billal-mesloub).
 
-快速开始
+### Zed
+
+The [zed-just](https://github.com/Unity-Billal-mesloub/zed-just/) extension by
+[jackTabsCode](https://github.com/Unity-Billal-mesloub) is avilable on the
+[Zed extensions page](https://zed.dev/extensions?query=just).
+
+### Other Editors
+
+Feel free to send me the commands necessary to get syntax highlighting working
+in your editor of choice so that I may include them here.
+
+### Language Server Protocol
+
+[just-lsp](https://github.com/Unity-Billal-mesloub/just-lsp) provides a [language server
+protocol](https://en.wikipedia.org/wiki/Language_Server_Protocol)
+implementation, enabling features such as go-to-definition, inline diagnostics,
+and code completion.
+
+### Model Context Protocol
+
+[just-mcp](http://github.com/Unity-Billal-mesloub/just-mcp) provides a
+[model context protocol](https://en.wikipedia.org/wiki/Model_Context_Protocol)
+adapter to allow LLMs to query the contents of `justfiles` and run recipes.
+
+Quick Start
 -----------
 
-参见 [安装部分](#安装) 了解如何在你的电脑上安装 `just`。试着运行 `just --version` 以确保它被正确安装。
+See the installation section for how to install `just` on your computer. Try
+running `just --version` to make sure that it's installed correctly.
 
-关于语法的概述，请查看这个 [速查表](https://cheatography.com/linux-china/cheat-sheets/justfile/)。
+For an overview of the syntax, check out
+[this cheatsheet](https://cheatography.com/linux-china/cheat-sheets/justfile/).
 
-一旦 `just` 安装完毕并开始工作，在你的项目根目录创建一个名为 `justfile` 的文件，内容如下：
+Once `just` is installed and working, create a file named `justfile` in the
+root of your project with the following contents:
 
 ```just
 recipe-name:
   echo 'This is a recipe!'
 
-# 这是一行注释
+# this is a comment
 another-recipe:
   @echo 'This is another recipe.'
 ```
 
-当你调用 `just` 时，它会在当前目录和父目录寻找文件 `justfile`，所以你可以从你项目的任何子目录中调用它。
+When you invoke `just` it looks for file `justfile` in the current directory
+and upwards, so you can invoke it from any subdirectory of your project.
 
-搜索 `justfile` 是不分大小写的，所以任何大小写，如 `Justfile`、`JUSTFILE` 或 `JuStFiLe` 都可以工作。`just` 也会寻找名字为 `.justfile` 的文件，以便你打算隐藏一个 `justfile`。
+The search for a `justfile` is case insensitive, so any case, like `Justfile`,
+`JUSTFILE`, or `JuStFiLe`, will work. `just` will also look for files with the
+name `.justfile`, in case you'd like to hide a `justfile`.
 
-运行 `just` 时未传参数，则运行 `justfile` 中的第一个配方：
+Running `just` with no arguments runs the first recipe in the `justfile`:
 
-```sh
+```console
 $ just
 echo 'This is a recipe!'
 This is a recipe!
 ```
 
-通过一个或多个参数指定要运行的配方：
+One or more arguments specify the recipe(s) to run:
 
-```sh
+```console
 $ just another-recipe
 This is another recipe.
 ```
 
-`just` 在运行每条命令前都会将其打印到标准错误中，这就是为什么 `echo 'This is a recipe!'` 被打印出来。对于以 `@` 开头的行，这将被抑制，这就是为什么 `echo 'This is another recipe.'` 没有被打印。
+`just` prints each command to standard error before running it, which is why
+`echo 'This is a recipe!'` was printed. This is suppressed for lines starting
+with `@`, which is why `echo 'This is another recipe.'` was not printed.
 
-如果一个命令失败，配方就会停止运行。这里 `cargo publish` 只有在 `cargo test` 成功后才会运行：
+Recipes stop running if a command fails. Here `cargo publish` will only run if
+`cargo test` succeeds:
 
 ```just
 publish:
   cargo test
-  # 前面的测试通过才会执行 publish!
+  # tests passed, time to publish!
   cargo publish
 ```
 
-配方可以依赖其他配方。在这里，`test` 配方依赖于 `build` 配方，所以 `build` 将在 `test` 之前运行：
+Recipes can depend on other recipes. Here the `test` recipe depends on the
+`build` recipe, so `build` will run before `test`:
 
 ```just
 build:
@@ -483,48 +669,65 @@ sloc:
   @echo "`wc -l *.c` lines of code"
 ```
 
-```sh
+```console
 $ just test
 cc main.c foo.c bar.c -o main
 ./test
 testing… all tests passed!
 ```
 
-没有依赖关系的配方将按照命令行上给出的顺序运行：
+Recipes without dependencies will run in the order they're given on the command
+line:
 
-```sh
+```console
 $ just build sloc
 cc main.c foo.c bar.c -o main
 1337 lines of code
 ```
 
-依赖项总是先运行，即使它们被放在依赖它们的配方之后：
+Dependencies will always run first, even if they are passed after a recipe that
+depends on them:
 
-```sh
+```console
 $ just test build
 cc main.c foo.c bar.c -o main
 ./test
 testing… all tests passed!
 ```
 
-示例
+Recipes may depend on recipes in submodules:
+
+```justfile
+mod foo
+
+baz: foo::bar
+```
+
+Examples
 --------
 
-在 [Examples 目录](https://github.com/casey/just/tree/master/examples) 中可以找到各种 `justfile` 的例子。
+A variety of `justfile`s can be found in the
+[examples directory](https://github.com/Unity-Billal-mesloub/just/tree/main/examples) and on
+[GitHub](https://github.com/search?q=path%3A**%2Fjustfile&type=code).
 
-特性介绍
+Features
 --------
 
-### 默认配方
+### The Default Recipe
 
-当 `just` 被调用而没有传入任何配方时，它会运行 `justfile` 中的第一个配方。这个配方可能是项目中最常运行的命令，比如运行测试：
+When `just` is invoked without a recipe, it runs the recipe with the
+`[default]` attribute, or the first recipe in the `justfile` if no recipe has
+the `[default]` attribute.
+
+This recipe might be the most frequently run command in the project, like
+running the tests:
 
 ```just
 test:
   cargo test
 ```
 
-你也可以使用依赖关系来默认运行多个配方：
+You can also use dependencies to run multiple recipes by default:
 
 ```just
 default: lint build test
@@ -539,18 +742,19 @@ lint:
   echo Linting…
 ```
 
-在没有合适配方作为默认配方的情况下，你也可以在 `justfile` 的开头添加一个配方，用于列出可用的配方：
+If no recipe makes sense as the default recipe, you can add a recipe to the
+beginning of your `justfile` that lists the available recipes:
 
 ```just
 default:
   just --list
 ```
 
-### 列出可用的配方
+### Listing Available Recipes
 
-可以用 `just --list` 按字母顺序列出配方：
+Recipes can be listed in alphabetical order with `just --list`:
 
-```sh
+```console
 $ just --list
 Available recipes:
     build
@@ -559,14 +763,32 @@ Available recipes:
     lint
 ```
 
-`just --summary` 以更简洁的形式列出配方：
+Recipes in [submodules](#modules1190) can be listed with `just --list PATH`,
+where `PATH` is a space- or `::`-separated module path:
 
-```sh
+```
+$ cat justfile
+mod foo
+$ cat foo.just
+mod bar
+$ cat bar.just
+baz:
+$ just --list foo bar
+Available recipes:
+    baz
+$ just --list foo::bar
+Available recipes:
+    baz
+```
+
+`just --summary` is more concise:
+
+```console
 $ just --summary
 build test deploy lint
 ```
 
-传入 `--unsorted` 选项可以按照它们在 `justfile` 中出现的顺序打印配方：
+Pass `--unsorted` to print recipes in the order they appear in the `justfile`:
 
 ```just
 test:
@@ -576,56 +798,168 @@ build:
   echo 'Building!'
 ```
 
-```sh
+```console
 $ just --list --unsorted
 Available recipes:
     test
     build
 ```
 
-```sh
+```console
 $ just --summary --unsorted
 test build
 ```
 
-如果你想让 `just` 默认列出 `justfile` 中的配方，你可以使用这个作为默认配方：
+If you'd like `just` to default to listing the recipes in the `justfile`, you
+can use this as your default recipe:
 
 ```just
 default:
   @just --list
 ```
 
-请注意，你可能需要在上面这一行中添加 `--justfile {{justfile()}}`。没有它，如果你执行 `just -f /some/distant/justfile -d .` 或 `just -f ./non-standard-justfile` 配方中的普通 `just --list` 就不一定会使用你提供的文件，它将试图在你的当前路径中找到一个 `justfile`，甚至可能导致 `No justfile found` 的错误。
+Note that you may need to add `--justfile {{justfile()}}` to the line above.
+Without it, if you executed `just -f /some/distant/justfile -d .` or
+`just -f ./non-standard-justfile`, the plain `just --list` inside the recipe
+would not necessarily use the file you provided. It would try to find a
+justfile in your current path, maybe even resulting in a `No justfile found`
+error.
 
-标题文本可以用 `--list-heading` 来定制：
+The heading text can be customized with `--list-heading`:
 
-```sh
+```console
 $ just --list --list-heading $'Cool stuff…\n'
 Cool stuff…
     test
     build
 ```
 
-而缩进可以用 `--list-prefix` 来定制：
+And the indentation can be customized with `--list-prefix`:
 
-```sh
+```console
 $ just --list --list-prefix ····
 Available recipes:
 ····test
 ····build
 ```
 
-`--list-heading` 参数同时替换了标题和后面的换行，所以如果不是空的，应该包含一个换行。这样做是为了允许你通过传递空字符串来完全抑制标题行：
+The argument to `--list-heading` replaces both the heading and the newline
+following it, so it should contain a newline if non-empty. It works this way so
+you can suppress the heading line entirely by passing the empty string:
 
-```sh
+```console
 $ just --list --list-heading ''
     test
     build
 ```
 
-### 别名
+### Invoking Multiple Recipes
 
-别名允许你用其他名称来调用配方：
+Multiple recipes may be invoked on the command line at once:
+
+```just
+build:
+  make web
+
+serve:
+  python3 -m http.server -d out 8000
+```
+
+```console
+$ just build serve
+make web
+python3 -m http.server -d out 8000
+```
+
+Keep in mind that recipes with parameters will swallow arguments, even if they
+match the names of other recipes:
+
+```just
+build project:
+  make {{project}}
+
+serve:
+  python3 -m http.server -d out 8000
+```
+
+```console
+$ just build serve
+make: *** No rule to make target `serve'.  Stop.
+```
+
+The `--one` flag can be used to restrict command-line invocations to a single
+recipe:
+
+```console
+$ just --one build serve
+error: Expected 1 command-line recipe invocation but found 2.
+```
+
+### Working Directory
+
+By default, recipes run with the working directory set to the directory that
+contains the `justfile`.
+
+The `[no-cd]` attribute can be used to make recipes run with the working
+directory set to directory in which `just` was invoked.
+
+```just
+@foo:
+  pwd
+
+[no-cd]
+@bar:
+  pwd
+```
+
+```console
+$ cd subdir
+$ just foo
+/
+$ just bar
+/subdir
+```
+
+You can override the working directory for all recipes with
+`set working-directory := '…'`:
+
+```just
+set working-directory := 'bar'
+
+@foo:
+  pwd
+```
+
+```console
+$ pwd
+/home/bob
+$ just foo
+/home/bob/bar
+```
+
+You can override the working directory for a specific recipe with the
+`working-directory` attribute<sup>1.38.0</sup>:
+
+```just
+[working-directory: 'bar']
+@foo:
+  pwd
+```
+
+```console
+$ pwd
+/home/bob
+$ just foo
+/home/bob/bar
+```
+
+The argument to the `working-directory` setting or `working-directory`
+attribute may be absolute or relative. If it is relative it is interpreted
+relative to the default working directory.
+
+### Aliases
+
+Aliases allow recipes to be invoked on the command line with alternative names:
 
 ```just
 alias b := build
@@ -634,18 +968,26 @@ build:
   echo 'Building!'
 ```
 
-```sh
+```console
 $ just b
-build
 echo 'Building!'
 Building!
 ```
 
-### 设置
+The target of an alias may be a recipe in a submodule:
 
-设置控制解释和执行。每个设置最多可以指定一次，可以出现在 `justfile` 的任何地方。
+```justfile
+mod foo
 
-例如：
+alias baz := foo::bar
+```
+
+### Settings
+
+Settings control interpretation and execution. Each setting may be specified at
+most once, anywhere in the `justfile`.
+
+For example:
 
 ```just
 set shell := ["zsh", "-cu"]
@@ -655,40 +997,54 @@ foo:
   ls **/*.txt
 ```
 
-#### 设置一览表
+#### Table of Settings
 
-| 名称                        | 值                 | 默认  | 描述                                                                                    |
-| --------------------------- | ------------------ | ----- | --------------------------------------------------------------------------------------- |
-| `allow-duplicate-recipes`   | boolean            | False | 允许在 `justfile` 后面出现的配方覆盖之前的同名配方                                      |
-| `allow-duplicate-variables` | boolean            | False | 允许在 `justfile` 后面出现的变量覆盖之前的同名变量                                      |
-| `dotenv-filename`           | string             | -     | 如果有自定义名称的 `.env` 环境变量文件的话，则将其加载                                  |
-| `dotenv-load`               | boolean            | False | 如果有`.env` 环境变量文件的话，则将其加载                                               |
-| `dotenv-path`               | string             | -     | 从自定义路径中加载 `.env` 环境变量文件， 文件不存在将会报错。可以覆盖 `dotenv-filename` |
-| `dotenv-required`           | boolean            | False | 如果 `.env` 环境变量文件不存在的话，需要报错                                                         |
-| `export`                    | boolean            | False | 将所有变量导出为环境变量                                                                |
-| `fallback`                  | boolean            | False | 如果命令行中的第一个配方没有找到，则在父目录中搜索 `justfile`                           |
-| `ignore-comments`           | boolean            | False | 忽略以`#`开头的配方行                                                                   |
-| `positional-arguments`      | boolean            | False | 传递位置参数                                                                            |
-| `shell`                     | `[COMMAND, ARGS…]` | -     | 设置用于调用配方和评估反引号内包裹内容的命令                                            |
-| `tempdir`                   | string             | -     | 在 `tempdir` 位置创建临时目录，而不是系统默认的临时目录                                 |
-| `windows-powershell`        | boolean            | False | 在 Windows 上使用 PowerShell 作为默认 Shell(废弃，建议使用 `windows-shell`)             |
-| `windows-shell`             | `[COMMAND, ARGS…]` | -     | 设置用于调用配方和评估反引号内包裹内容的命令                                            |
+| Name | Value | Default | Description |
+|------|-------|---------|-------------|
+| `allow-duplicate-recipes` | boolean | `false` | Allow recipes appearing later in a `justfile` to override earlier recipes with the same name. |
+| `allow-duplicate-variables` | boolean | `false` | Allow variables appearing later in a `justfile` to override earlier variables with the same name. |
+| `dotenv-filename` | string | - | Load a `.env` file with a custom name, if present. |
+| `dotenv-load` | boolean | `false` | Load a `.env` file, if present. |
+| `dotenv-override` | boolean | `false` | Override existing environment variables with values from the `.env` file. |
+| `dotenv-path` | string | - | Load a `.env` file from a custom path and error if not present. Overrides `dotenv-filename`. |
+| `dotenv-required` | boolean | `false` | Error if a `.env` file isn't found. |
+| `export` | boolean | `false` | Export all variables as environment variables. |
+| `fallback` | boolean | `false` | Search `justfile` in parent directory if the first recipe on the command line is not found. |
+| `ignore-comments` | boolean | `false` | Ignore recipe lines beginning with `#`. |
+| `positional-arguments` | boolean | `false` | Pass positional arguments. |
+| `quiet` | boolean | `false` | Disable echoing recipe lines before executing. |
+| `script-interpreter`<sup>1.33.0</sup> | `[COMMAND, ARGS…]` | `['sh', '-eu']` | Set command used to invoke recipes with empty `[script]` attribute. |
+| `shell` | `[COMMAND, ARGS…]` | - | Set command used to invoke recipes and evaluate backticks. |
+| `tempdir` | string | - | Create temporary directories in `tempdir` instead of the system default temporary directory. |
+| `unstable`<sup>1.31.0</sup> | boolean | `false` | Enable unstable features. |
+| `windows-powershell` | boolean | `false` | Use PowerShell on Windows as default shell. (Deprecated. Use `windows-shell` instead. |
+| `windows-shell` | `[COMMAND, ARGS…]` | - | Set the command used to invoke recipes and evaluate backticks. |
+| `working-directory`<sup>1.33.0</sup> | string | - | Set the working directory for recipes and backticks, relative to the default working directory. |
 
-Bool 类型设置可以写成：
+Boolean settings can be written as:
 
 ```justfile
 set NAME
 ```
 
-这就相当于：
+Which is equivalent to:
 
 ```justfile
 set NAME := true
 ```
 
-#### 允许重复的配方
+Non-boolean settings can be set to both strings and
+expressions.<sup>1.46.0</sup>
 
-如果 `allow-duplicate-recipes` 被设置为 `true`，那么定义多个同名的配方就不会出错，而会使用最后的定义。默认为 `false`。
+However, because settings affect the behavior of backticks and many functions,
+those expressions may not contain backticks or function calls, directly or
+transitively via reference.
+
+#### Allow Duplicate Recipes
+
+If `allow-duplicate-recipes` is set to `true`, defining multiple recipes with
+the same name is not an error and the last definition is used. Defaults to
+`false`.
 
 ```just
 set allow-duplicate-recipes
@@ -700,13 +1056,16 @@ set allow-duplicate-recipes
   echo bar
 ```
 
-```sh
+```console
 $ just foo
 bar
 ```
 
-#### 允许重复的变量
-如果 `allow-duplicate-variables` 被设置为 `true`，那么定义多个同名的变量将不会报错。默认为 `false`。
+#### Allow Duplicate Variables
+
+If `allow-duplicate-variables` is set to `true`, defining multiple variables
+with the same name is not an error and the last definition is used. Defaults to
+`false`.
 
 ```just
 set allow-duplicate-variables
@@ -715,43 +1074,55 @@ a := "foo"
 a := "bar"
 
 @foo:
-  echo $a
+  echo {{a}}
 ```
 
-```sh
+```console
 $ just foo
 bar
 ```
 
-#### 环境变量加载
+#### Dotenv Settings
 
-如果 `dotenv-load`, `dotenv-filename`, `dotenv-path`, or `dotenv-required`
-中任意一项被设置, `just` 会尝试从文件中加载环境变量
+If any of `dotenv-load`, `dotenv-filename`, `dotenv-override`, `dotenv-path`,
+or `dotenv-required` are set, `just` will try to load environment variables
+from a file.
 
-如果设置了 `dotenv-path`, `just` 会在指定的路径下搜索文件，该路径可以是绝对路径，
-也可以是基于当前工作路径的相对路径
+If `dotenv-path` is set, `just` will look for a file at the given path, which
+may be absolute, or relative to the working directory.
 
-如果设置了 `dotenv-filename`，`just` 会在指定的相对路径，以及其所有的上层目录中，搜索指定文件
+The command-line option `--dotenv-path`, short form `-E`, can be used to set or
+override `dotenv-path` at runtime.
 
-如果没有设置 `dotenv-filename`，但是设置了 `dotenv-load` 或 `dotenv-required`，
-`just` 会在当前工作路径，以及其所有的上层目录中，寻找名为 `.env` 的文件。
+If `dotenv-filename` is set `just` will look for a file at the given path,
+relative to the working directory and each of its ancestors.
 
-`dotenv-filename` 和 `dotenv-path` 很相似，但是 `dotenv-path` 只会检查指定的目录
-而 `dotenv-filename` 会检查指定目录以及其所有的上层目录。
+If `dotenv-filename` is not set, but `dotenv-load` or `dotenv-required` are
+set, just will look for a file named `.env`, relative to the working directory
+and each of its ancestors.
 
-如果没有找到环境变量文件也不会报错，除非设置了 `dotenv-required`。
+`dotenv-filename` and `dotenv-path` are similar, but `dotenv-path` is only
+checked relative to the working directory, whereas `dotenv-filename` is checked
+relative to the working directory and each of its ancestors.
 
-从文件中加载的变量是环境变量，而非 `just` 变量，所以在配方和反引号中需要必须通过 `$VARIABLE_NAME` 来调用。
+It is not an error if an environment file is not found, unless
+`dotenv-required` is set.
 
-比如，如果你的 `.env` 文件包含以下内容：
+The loaded variables are environment variables, not `just` variables, and so
+must be accessed using `$VARIABLE_NAME` in recipes and backticks.
 
-```sh
+If `dotenv-override` is set, variables from the environment file will override
+existing environment variables.
+
+For example, if your `.env` file contains:
+
+```console
 # a comment, will be ignored
 DATABASE_ADDRESS=localhost:6379
 SERVER_PORT=1337
 ```
 
-并且你的 `justfile` 包含：
+And your `justfile` contains:
 
 ```just
 set dotenv-load
@@ -761,17 +1132,18 @@ serve:
   ./server --database $DATABASE_ADDRESS --port $SERVER_PORT
 ```
 
-`just serve` 将会输出：
+`just serve` will output:
 
-```sh
+```console
 $ just serve
 Starting server with database localhost:6379 on port 1337…
 ./server --database $DATABASE_ADDRESS --port $SERVER_PORT
 ```
 
-#### 导出
+#### Export
 
-`export` 设置使所有 `just` 变量作为环境变量被导出。默认值为 `false`。
+The `export` setting causes all `just` variables to be exported as environment
+variables. Defaults to `false`.
 
 ```just
 set export
@@ -783,17 +1155,19 @@ a := "hello"
   echo $b
 ```
 
-```sh
+```console
 $ just foo goodbye
 hello
 goodbye
 ```
 
-#### 位置参数
+#### Positional Arguments
 
-如果 `positional-arguments` 为 `true`，配方参数将作为位置参数传递给命令。对于行式配方，参数 `$0` 将是配方的名称。
+If `positional-arguments` is `true`, recipe arguments will be passed as
+positional arguments to commands. For linewise recipes, argument `$0` will be
+the name of the recipe.
 
-例如，运行这个配方：
+For example, running this recipe:
 
 ```just
 set positional-arguments
@@ -803,17 +1177,22 @@ set positional-arguments
   echo $1
 ```
 
-将产生以下输出：
+Will produce the following output:
 
-```sh
+```console
 $ just foo hello
 foo
 hello
 ```
 
-当使用 `sh` 兼容的 Shell，如 `bash` 或 `zsh` 时，`$@` 会展开为传给配方的位置参数，从1开始。当在双引号内使用 `"$@"` 时，包括空白的参数将被传递，就像它们是双引号一样。也就是说，`"$@"` 相当于 `"$1" "$2"`......当没有位置参数时，`"$@"` 和 `$@` 将展开为空（即，它们被删除）。
+When using an `sh`-compatible shell, such as `bash` or `zsh`, `$@` expands to
+the positional arguments given to the recipe, starting from one. When used
+within double quotes as `"$@"`, arguments including whitespace will be passed
+on as if they were double-quoted. That is, `"$@"` is equivalent to `"$1" "$2"`…
+When there are no positional parameters, `"$@"` and `$@` expand to nothing
+(i.e., they are removed).
 
-这个例子的配方将逐行打印参数：
+This example recipe will print arguments one by one on separate lines:
 
 ```just
 set positional-arguments
@@ -822,17 +1201,43 @@ set positional-arguments
   bash -c 'while (( "$#" )); do echo - $1; shift; done' -- "$@"
 ```
 
-用 _两个_ 参数运行：
+Running it with _two_ arguments:
 
-```sh
+```console
 $ just test foo "bar baz"
 - foo
 - bar baz
 ```
 
+Positional arguments may also be turned on on a per-recipe basis with the
+`[positional-arguments]` attribute<sup>1.29.0</sup>:
+
+```just
+[positional-arguments]
+@foo bar:
+  echo $0
+  echo $1
+```
+
+Note that PowerShell does not handle positional arguments in the same way as
+other shells, so turning on positional arguments will likely break recipes that
+use PowerShell.
+
+If using PowerShell 7.4 or better, the `-CommandWithArgs` flag will make
+positional arguments work as expected:
+
+```just
+set shell := ['pwsh.exe', '-CommandWithArgs']
+set positional-arguments
+
+print-args a b c:
+  Write-Output @($args[1..($args.Count - 1)])
+```
+
 #### Shell
 
-`shell` 设置控制用于调用执行配方代码行和反引号内指令的命令。Shebang 配方不受影响。
+The `shell` setting controls the command used to invoke recipe lines and
+backticks. Shebang recipes are unaffected. The default shell is `sh -cu`.
 
 ```just
 # use python3 to execute recipe lines and backticks
@@ -846,11 +1251,13 @@ foo:
   print("{{foos}}")
 ```
 
-`just` 把要执行的命令作为一个参数进行传递。许多 Shell 需要一个额外的标志，通常是 `-c`，以使它们评估执行第一个参数。
+`just` passes the command to be executed as an argument. Many shells will need
+an additional flag, often `-c`, to make them evaluate the first argument.
 
 ##### Windows Shell
 
-`just` 在 Windows 上默认使用 `sh`。要在 Windows 上使用不同的 Shell，请使用`windows-shell`：
+`just` uses `sh` on Windows by default. To use a different shell on Windows,
+use `windows-shell`:
 
 ```just
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
@@ -859,13 +1266,18 @@ hello:
   Write-Host "Hello, world!"
 ```
 
-参考 [powershell.just](https://github.com/casey/just/blob/master/examples/powershell.just) ，了解在所有平台上使用 PowerShell 的 justfile。
+See
+[powershell.just](https://github.com/Unity-Billal-mesloub/just/blob/main/examples/powershell.just)
+for a justfile that uses PowerShell on all platforms.
 
 ##### Windows PowerShell
 
-*`set windows-powershell` 使用遗留的 `powershell.exe` 二进制文件，不再推荐。请参阅上面的 `windows-shell` 设置，以通过更灵活的方式来控制在 Windows 上使用哪个 Shell。*
+*`set windows-powershell` uses the legacy `powershell.exe` binary, and is no
+longer recommended. See the `windows-shell` setting above for a more flexible
+way to control which shell is used on Windows.*
 
-`just` 在 Windows 上默认使用 `sh`。要使用 `powershell.exe` 作为替代，请将 `windows-powershell` 设置为 `true`。
+`just` uses `sh` on Windows by default. To use `powershell.exe` instead, set
+`windows-powershell` to true.
 
 ```just
 set windows-powershell := true
@@ -904,17 +1316,18 @@ set shell := ["fish", "-c"]
 set shell := ["nu", "-c"]
 ```
 
-如果你想设置默认的表格显示模式为 `light`:
+If you want to change the default table mode to `light`:
 
 ```just
 set shell := ['nu', '-m', 'light', '-c']
 ```
 
-*[Nushell](https://github.com/nushell/nushell) 使用 Rust 开发并且具备良好的跨平台能力，**支持 Windows / macOS 和各种 Linux 发行版***
+*[Nushell](https://github.com/Unity-Billal-mesloub/nushell) was written in Rust, and **has
+cross-platform support for Windows / macOS and Linux**.*
 
-### 文档注释
+### Documentation Comments
 
-紧接着配方前面的注释将出现在 `just --list` 中：
+Comments immediately preceding a recipe will appear in `just --list`:
 
 ```just
 # build stuff
@@ -926,35 +1339,92 @@ test:
   ./bin/test
 ```
 
-```sh
+```console
 $ just --list
 Available recipes:
     build # build stuff
     test # test stuff
 ```
 
-### 变量和替换
+The `[doc]` attribute can be used to set or suppress a recipe's doc comment:
 
-支持在变量、字符串、拼接、路径连接和替换中使用 `{{…}}` ：
+```just
+# This comment won't appear
+[doc('Build stuff')]
+build:
+  ./bin/build
+
+# This one won't either
+[doc]
+test:
+  ./bin/test
+```
+
+```console
+$ just --list
+Available recipes:
+    build # Build stuff
+    test
+```
+
+### Expressions and Substitutions
+
+Various operators and function calls are supported in expressions, which may be
+used in assignments, default recipe arguments, and inside recipe body `{{…}}`
+substitutions.
 
 ```just
 tmpdir  := `mktemp -d`
 version := "0.2.7"
 tardir  := tmpdir / "awesomesauce-" + version
 tarball := tardir + ".tar.gz"
+config  := quote(config_dir() / ".project-config")
 
 publish:
   rm -f {{tarball}}
   mkdir {{tardir}}
-  cp README.md *.c {{tardir}}
+  cp README.md *.c {{ config }} {{tardir}}
   tar zcvf {{tarball}} {{tardir}}
   scp {{tarball}} me@server.com:release/
   rm -rf {{tarball}} {{tardir}}
 ```
 
-#### 路径拼接
+#### Concatenation
 
-`/` 操作符可用于通过斜线连接两个字符串：
+The `+` operator returns the left-hand argument concatenated with the
+right-hand argument:
+
+```just
+foobar := 'foo' + 'bar'
+```
+
+#### Logical Operators
+
+The logical operators `&&` and `||` can be used to coalesce string
+values<sup>1.37.0</sup>, similar to Python's `and` and `or`. These operators
+consider the empty string `''` to be false, and all other strings to be true.
+
+These operators are currently unstable.
+
+The `&&` operator returns the empty string if the left-hand argument is the
+empty string, otherwise it returns the right-hand argument:
+
+```justfile
+foo := '' && 'goodbye'      # ''
+bar := 'hello' && 'goodbye' # 'goodbye'
+```
+
+The `||` operator returns the left-hand argument if it is non-empty, otherwise
+it returns the right-hand argument:
+
+```justfile
+foo := '' || 'goodbye'      # 'goodbye'
+bar := 'hello' || 'goodbye' # 'hello'
+```
+
+#### Joining Paths
+
+The `/` operator can be used to join two strings with a slash:
 
 ```just
 foo := "a" / "b"
@@ -965,7 +1435,7 @@ $ just --evaluate foo
 a/b
 ```
 
-请注意，即使已经有一个 `/`，也会添加一个 `/`：
+Note that a `/` is added even if one is already present:
 
 ```just
 foo := "a/"
@@ -977,7 +1447,7 @@ $ just --evaluate bar
 a//b
 ```
 
-也可以构建绝对路径<sup>1.5.0</sup>:
+Absolute paths can also be constructed<sup>1.5.0</sup>:
 
 ```just
 foo := / "b"
@@ -988,59 +1458,72 @@ $ just --evaluate foo
 /b
 ```
 
-`/` 操作符使用 `/` 字符，即使在 Windows 上也是如此。因此，在使用通用命名规则（UNC）的路径中应避免使用 `/` 操作符，即那些以 `\?` 开头的路径，因为 UNC 路径不支持正斜线。
+The `/` operator uses the `/` character, even on Windows. Thus, using the `/`
+operator should be avoided with paths that use universal naming convention
+(UNC), i.e., those that start with `\?`, since forward slashes are not
+supported with UNC paths.
 
-#### 转义 `{{`
+#### Escaping `{{`
 
-想要写一个包含  `{{` 的配方，可以使用 `{{{{`：
+To write a recipe containing `{{`, use `{{{{`:
 
 ```just
 braces:
   echo 'I {{{{LOVE}} curly braces!'
 ```
 
-(未匹配的 `}}` 会被忽略，所以不需要转义)
+(An unmatched `}}` is ignored, so it doesn't need to be escaped.)
 
-另一个选择是把所有你想转义的文本都放在插值里面：
+Another option is to put all the text you'd like to escape inside of an
+interpolation:
 
 ```just
 braces:
   echo '{{'I {{LOVE}} curly braces!'}}'
 ```
 
-然而，另一个选择是使用  `{{ "{{" }}`：
+Yet another option is to use `{{ "{{" }}`:
 
 ```just
 braces:
   echo 'I {{ "{{" }}LOVE}} curly braces!'
 ```
 
-### 字符串
+### Strings
 
-双引号字符串支持转义序列：
+`'single'`, `"double"`, and `'''triple'''` quoted string literals are
+supported. Unlike in recipe bodies, `{{…}}` interpolations are not supported
+inside strings.
+
+Double-quoted strings support escape sequences:
 
 ```just
-string-with-tab             := "\t"
-string-with-newline         := "\n"
-string-with-carriage-return := "\r"
-string-with-double-quote    := "\""
-string-with-slash           := "\\"
-string-with-no-newline      := "\
+carriage-return   := "\r"
+double-quote      := "\""
+newline           := "\n"
+no-newline        := "\
 "
+slash             := "\\"
+tab               := "\t"
+unicode-codepoint := "\u{1F916}"
 ```
 
-```sh
+```console
 $ just --evaluate
-"tring-with-carriage-return := "
-string-with-double-quote    := """
-string-with-newline         := "
+"arriage-return   := "
+double-quote      := """
+newline           := "
 "
-string-with-no-newline      := ""
-string-with-slash           := "\"
-string-with-tab             := "     "
+no-newline        := ""
+slash             := "\"
+tab               := "     "
+unicode-codepoint := "🤖"
 ```
 
-字符串可以包含换行符：
+The unicode character escape sequence `\u{…}`<sup>1.36.0</sup> accepts up to
+six hex digits.
+
+Strings may contain line breaks:
 
 ```just
 single := '
@@ -1052,27 +1535,30 @@ goodbye
 "
 ```
 
-单引号字符串不支持转义序列：
+Single-quoted strings do not recognize escape sequences:
 
 ```just
 escapes := '\t\n\r\"\\'
 ```
 
-```sh
+```console
 $ just --evaluate
 escapes := "\t\n\r\"\\"
 ```
 
-支持单引号和双引号字符串的缩进版本，以三个单引号或三个双引号为界。缩进的字符串行被删除了所有非空行所共有的前导空白：
+Indented versions of both single- and double-quoted strings, delimited by
+triple single- or double-quotes, are supported. Indented string lines are
+stripped of a leading line break, and leading whitespace common to all
+non-blank lines:
 
 ```just
-# 这个字符串执行结果为 `foo\nbar\n`
+# this string will evaluate to `foo\nbar\n`
 x := '''
   foo
   bar
 '''
 
-# 这个字符串执行结果为 `abc\n  wuv\nbar\n`
+# this string will evaluate to `abc\n  wuv\nxyz\n`
 y := """
   abc
     wuv
@@ -1080,11 +1566,57 @@ y := """
 """
 ```
 
-与未缩进的字符串类似，缩进的双引号字符串处理转义序列，而缩进的单引号字符串则忽略转义序列。转义序列的处理是在取消缩进后进行的。取消缩进的算法不考虑转义序列产生的空白或换行。
+Similar to unindented strings, indented double-quoted strings process escape
+sequences, and indented single-quoted strings ignore escape sequences. Escape
+sequence processing takes place after unindentation. The unindentation
+algorithm does not take escape-sequence produced whitespace or newlines into
+account.
 
-### 错误忽略
+#### Shell-expanded strings
 
-通常情况下，如果一个命令返回一个非零的退出状态，将停止执行。要想在一个命令之后继续执行，即使它失败了，需要在命令前加上 `-`：
+Strings prefixed with `x` are shell expanded<sup>1.27.0</sup>:
+
+```justfile
+foobar := x'~/$FOO/${BAR}'
+```
+
+| Value | Replacement |
+|------|-------------|
+| `$VAR` | value of environment variable `VAR` |
+| `${VAR}` | value of environment variable `VAR` |
+| `${VAR:-DEFAULT}` | value of environment variable `VAR`, or `DEFAULT` if `VAR` is not set |
+| Leading `~` | path to current user's home directory |
+| Leading `~USER` | path to `USER`'s home directory |
+
+This expansion is performed at compile time, so variables from `.env` files and
+exported `just` variables cannot be used. However, this allows shell expanded
+strings to be used in places like settings and import paths, which cannot
+depend on `just` variables and `.env` files.
+
+#### Format strings
+
+Strings prefixed with `f` are format strings<sup>1.44.0</sup>:
+
+```justfile
+name := "world"
+message := f'Hello, {{name}}!'
+```
+
+Format strings may contain interpolations delimited with `{{…}}` that contain
+expressions. Format strings evaluate to the concatenated string fragments and
+evaluated expressions.
+
+Use `{{{{` to include a literal `{{` in a format string:
+
+```justfile
+foo := f'I {{{{LOVE} curly braces!'
+```
+
+### Ignoring Errors
+
+Normally, if a command returns a non-zero exit status, execution will stop. To
+continue execution after a command, even if it fails, prefix the command with
+`-`:
 
 ```just
 foo:
@@ -1092,7 +1624,7 @@ foo:
   echo 'Done!'
 ```
 
-```sh
+```console
 $ just foo
 cat foo
 cat: foo: No such file or directory
@@ -1100,173 +1632,565 @@ echo 'Done!'
 Done!
 ```
 
-### 函数
+### Functions
 
-`just` 提供了一些内置函数，在编写配方时可能很有用。
+`just` provides many built-in functions for use in expressions, including
+recipe body `{{…}}` substitutions, assignments, and default parameter values.
 
-#### 系统信息
+All functions ending in `_directory` can be abbreviated to `_dir`. So
+`home_directory()` can also be written as `home_dir()`. In addition,
+`invocation_directory_native()` can be abbreviated to
+`invocation_dir_native()`.
 
-- `arch()` — 指令集结构。可能的值是：`"aarch64"`, `"arm"`, `"asmjs"`, `"hexagon"`, `"mips"`, `"msp430"`, `"powerpc"`, `"powerpc64"`, `"s390x"`, `"sparc"`, `"wasm32"`, `"x86"`, `"x86_64"`, 和 `"xcore"`。
-- `os()` — 操作系统，可能的值是: `"android"`, `"bitrig"`, `"dragonfly"`, `"emscripten"`, `"freebsd"`, `"haiku"`, `"ios"`, `"linux"`, `"macos"`, `"netbsd"`, `"openbsd"`, `"solaris"`, 和 `"windows"`。
-- `os_family()` — 操作系统系列；可能的值是：`"unix"` 和 `"windows"`。
+#### System Information
 
-例如：
+- `arch()` — Instruction set architecture. Possible values are: `"aarch64"`,
+  `"arm"`, `"asmjs"`, `"hexagon"`, `"mips"`, `"msp430"`, `"powerpc"`,
+  `"powerpc64"`, `"s390x"`, `"sparc"`, `"wasm32"`, `"x86"`, `"x86_64"`, and
+  `"xcore"`.
+- `num_cpus()`<sup>1.15.0</sup> - Number of logical CPUs.
+- `os()` — Operating system. Possible values are: `"android"`, `"bitrig"`,
+  `"dragonfly"`, `"emscripten"`, `"freebsd"`, `"haiku"`, `"ios"`, `"linux"`,
+  `"macos"`, `"netbsd"`, `"openbsd"`, `"solaris"`, and `"windows"`.
+- `os_family()` — Operating system family; possible values are: `"unix"` and
+  `"windows"`.
+
+For example:
 
 ```just
 system-info:
   @echo "This is an {{arch()}} machine".
 ```
 
-```sh
+```console
 $ just system-info
 This is an x86_64 machine
 ```
 
-`os_family()` 函数可以用来创建跨平台的 `justfile`，使其可以在不同的操作系统上工作。一个例子，见 [cross-platform.just](https://github.com/casey/just/blob/master/examples/cross-platform.just) 文件。
+The `os_family()` function can be used to create cross-platform `justfile`s
+that work on various operating systems. For an example, see
+[cross-platform.just](https://github.com/Unity-Billal-mesloub/just/blob/main/examples/cross-platform.just)
+file.
 
-#### 环境变量
+#### External Commands
 
-- `env_var(key)` — 获取名称为 `key` 的环境变量，如果不存在则终止。
+- `shell(command, args...)`<sup>1.27.0</sup> returns the standard output of shell script
+  `command` with zero or more positional arguments `args`. The shell used to
+  interpret `command` is the same shell that is used to evaluate recipe lines,
+  and can be changed with `set shell := […]`.
+
+  `command` is passed as the first argument, so if the command is `'echo $@'`,
+  the full command line, with the default shell command `sh -cu` and `args`
+  `'foo'` and `'bar'` will be:
+
+  ```
+  'sh' '-cu' 'echo $@' 'echo $@' 'foo' 'bar'
+  ```
+
+  This is so that `$@` works as expected, and `$1` refers to the first
+  argument. `$@` does not include the first positional argument, which is
+  expected to be the name of the program being run.
 
 ```just
-home_dir := env_var('HOME')
+# arguments can be variables or expressions
+file := '/sys/class/power_supply/BAT0/status'
+bat0stat := shell('cat $1', file)
+
+# commands can be variables or expressions
+command := 'wc -l'
+output := shell(command + ' "$1"', 'main.c')
+
+# arguments referenced by the shell command must be used
+empty := shell('echo', 'foo')
+full := shell('echo $1', 'foo')
+error := shell('echo $1')
+```
+
+```just
+# Using python as the shell. Since `python -c` sets `sys.argv[0]` to `'-c'`,
+# the first "real" positional argument will be `sys.argv[2]`.
+set shell := ["python3", "-c"]
+olleh := shell('import sys; print(sys.argv[2][::-1])', 'hello')
+```
+
+#### Environment Variables
+
+- `env(key)`<sup>1.15.0</sup> — Retrieves the environment variable with name `key`, aborting
+  if it is not present.
+
+```just
+home_dir := env('HOME')
 
 test:
   echo "{{home_dir}}"
 ```
 
-```sh
+```console
 $ just
 /home/user1
 ```
 
-- `env_var_or_default(key, default)` — 获取名称为 `key` 的环境变量，如果不存在则返回 `default`。
+- `env(key, default)`<sup>1.15.0</sup> — Retrieves the environment variable with
+  name `key`, returning `default` if it is not present.
+- `env_var(key)` — Deprecated alias for `env(key)`.
+- `env_var_or_default(key, default)` — Deprecated alias for `env(key, default)`.
 
-#### 调用目录
+A default can be substituted for an empty environment variable value with the
+`||` operator, currently unstable:
 
-- `invocation_directory()` - 获取 `just` 被调用时当前目录所对应的绝对路径，在 `just` 改变路径并执行相应命令前。
+```just
+set unstable
 
-例如，要对 "当前目录" 下的文件调用 `rustfmt`（从用户/调用者的角度看），使用以下规则：
+foo := env('FOO', '') || 'DEFAULT_VALUE'
+```
+
+#### Executables
+
+- `require(name)`<sup>1.39.0</sup> — Search directories in the `PATH`
+  environment variable for the executable `name` and return its full path, or
+  halt with an error if no executable with `name` exists.
+
+  ```just
+  bash := require("bash")
+
+  @test:
+      echo "bash: '{{bash}}'"
+  ```
+
+  ```console
+  $ just
+  bash: '/bin/bash'
+  ```
+
+- `which(name)`<sup>1.39.0</sup> — Search directories in the `PATH` environment
+  variable for the executable `name` and return its full path, or the empty
+  string if no executable with `name` exists. Currently unstable.
+
+
+  ```just
+  set unstable
+
+  bosh := which("bosh")
+
+  @test:
+      echo "bosh: '{{bosh}}'"
+  ```
+
+  ```console
+  $ just
+  bosh: ''
+  ```
+
+#### Invocation Information
+
+- `is_dependency()` - Returns the string `true` if the current recipe is being
+  run as a dependency of another recipe, rather than being run directly,
+  otherwise returns the string `false`.
+
+#### Invocation Directory
+
+- `invocation_directory()` - Retrieves the absolute path to the current
+  directory when `just` was invoked, before  `just` changed it (chdir'd) prior
+  to executing commands. On Windows, `invocation_directory()` uses `cygpath` to
+  convert the invocation directory to a Cygwin-compatible `/`-separated path.
+  Use `invocation_directory_native()` to return the verbatim invocation
+  directory on all platforms.
+
+For example, to call `rustfmt` on files just under the "current directory"
+(from the user/invoker's perspective), use the following rule:
 
 ```just
 rustfmt:
   find {{invocation_directory()}} -name \*.rs -exec rustfmt {} \;
 ```
 
-另外，如果你的命令需要从当前目录运行，你可以使用如下方式：
+Alternatively, if your command needs to be run from the current directory, you
+could use (e.g.):
 
 ```just
 build:
   cd {{invocation_directory()}}; ./some_script_that_needs_to_be_run_from_here
 ```
 
-#### Justfile 和 Justfile 目录
+- `invocation_directory_native()` - Retrieves the absolute path to the current
+  directory when `just` was invoked, before  `just` changed it (chdir'd) prior
+  to executing commands.
 
-- `justfile()` - 取得当前 `justfile` 的路径。
+#### Justfile and Justfile Directory
 
-- `justfile_directory()` - 取得当前 `justfile` 文件父目录的路径。
+- `justfile()` - Retrieves the path of the current `justfile`.
 
-例如，运行一个相对于当前 `justfile` 位置的命令：
+- `justfile_directory()` - Retrieves the path of the parent directory of the
+  current `justfile`.
+
+For example, to run a command relative to the location of the current
+`justfile`:
 
 ```just
 script:
-  ./{{justfile_directory()}}/scripts/some_script
+  {{justfile_directory()}}/scripts/some_script
 ```
 
-#### Just 可执行程序
+#### Source and Source Directory
 
-- `just_executable()` - `just` 可执行文件的绝对路径。
+- `source_file()`<sup>1.27.0</sup> - Retrieves the path of the current source file.
 
-例如：
+- `source_directory()`<sup>1.27.0</sup> - Retrieves the path of the parent directory of the
+  current source file.
+
+`source_file()` and `source_directory()` behave the same as `justfile()` and
+`justfile_directory()` in the root `justfile`, but will return the path and
+directory, respectively, of the current `import` or `mod` source file when
+called from within an import or submodule.
+
+#### Just Executable
+
+- `just_executable()` - Absolute path to the `just` executable.
+
+For example:
 
 ```just
 executable:
   @echo The executable is at: {{just_executable()}}
 ```
 
-```sh
+```console
 $ just
 The executable is at: /bin/just
 ```
 
-#### 字符串处理
+#### Just Process ID
 
-- `quote(s)` - 用 `'\''` 替换所有的单引号，并在 `s` 的首尾添加单引号。这足以为许多 Shell 转义特殊字符，包括大多数 Bourne Shell 的后代。
-- `replace(s, from, to)` - 将 `s` 中的所有 `from` 替换为 `to`。
-- `replace_regex(s, regex, replacement)` - 将 `s` 中所有的 `regex` 替换为 `replacement`。正则表达式由 [Rust `regex` 包](https://docs.rs/regex/latest/regex/) 提供。参见 [语法文档](https://docs.rs/regex/latest/regex/#syntax) 以了解使用示例。
-- `trim(s)` - 去掉 `s` 的首尾空格。
-- `trim_end(s)` - 去掉 `s` 的尾部空格。
-- `trim_end_match(s, substr)` - 删除与 `substr` 匹配的 `s` 的后缀。
-- `trim_end_matches(s, substr)` - 反复删除与 `substr` 匹配的 `s` 的后缀。
-- `trim_start(s)` - 去掉 `s` 的首部空格。
-- `trim_start_match(s, substr)` - 删除与 `substr` 匹配的 `s` 的前缀。
-- `trim_start_matches(s, substr)` - 反复删除与 `substr` 匹配的 `s` 的前缀。
+- `just_pid()` - Process ID of the `just` executable.
 
-#### 大小写转换
+For example:
 
-- `capitalize(s)`<sup>1.7.0</sup> - 将 `s` 的第一个字符转换成大写字母，其余的转换成小写字母。
-- `kebabcase(s)`<sup>1.7.0</sup> - 将 `s` 转换为 `kebab-case`。
-- `lowercamelcase(s)`<sup>1.7.0</sup> - 将 `s` 转换为小驼峰形式：`lowerCamelCase`。
-- `lowercase(s)` - 将 `s` 转换为全小写形式。
-- `shoutykebabcase(s)`<sup>1.7.0</sup> - 将 `s` 转换为 `SHOUTY-KEBAB-CASE`。
-- `shoutysnakecase(s)`<sup>1.7.0</sup> - 将 `s` 转换为 `SHOUTY_SNAKE_CASE`。
-- `snakecase(s)`<sup>1.7.0</sup> - 将 `s` 转换为 `snake_case`。
-- `titlecase(s)`<sup>1.7.0</sup> - 将 `s` 转换为 `Title Case`。
-- `uppercamelcase(s)`<sup>1.7.0</sup> - 将 `s` 转换为 `UpperCamelCase`。
-- `uppercase(s)` - 将 `s` 转换为大写形式。
+```just
+pid:
+  @echo The process ID is: {{ just_pid() }}
+```
 
-#### 路径操作
+```console
+$ just
+The process ID is: 420
+```
 
-##### 非可靠的
+#### String Manipulation
 
-- `absolute_path(path)` - 将当前工作目录中到相对路径 `path` 的路径转换为绝对路径。在 `/foo` 目录通过 `absolute_path("./bar.txt")` 可以得到 `/foo/bar.txt`。
-- `extension(path)` - 获取 `path` 的扩展名。`extension("/foo/bar.txt")` 结果为 `txt`。
-- `file_name(path)` - 获取 `path` 的文件名，去掉任何前面的目录部分。`file_name("/foo/bar.txt")` 的结果为 `bar.txt`。
-- `file_stem(path)` - 获取 `path` 的文件名，不含扩展名。`file_stem("/foo/bar.txt")` 的结果为 `bar`。
-- `parent_directory(path)` - 获取 `path` 的父目录。`parent_directory("/foo/bar.txt")` 的结果为 `/foo`。
-- `without_extension(path)` - 获取 `path` 不含扩展名部分。`without_extension("/foo/bar.txt")` 的结果为 `/foo/bar`。
+- `append(suffix, s)`<sup>1.27.0</sup> Append `suffix` to whitespace-separated
+  strings in `s`. `append('/src', 'foo bar baz')` → `'foo/src bar/src baz/src'`
+- `prepend(prefix, s)`<sup>1.27.0</sup> Prepend `prefix` to
+  whitespace-separated strings in `s`. `prepend('src/', 'foo bar baz')` →
+  `'src/foo src/bar src/baz'`
+- `encode_uri_component(s)`<sup>1.27.0</sup> - Percent-encode characters in `s`
+  except `[A-Za-z0-9_.!~*'()-]`, matching the behavior of the
+  [JavaScript `encodeURIComponent` function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent).
+- `quote(s)` - Replace all single quotes with `'\''` and prepend and append
+  single quotes to `s`. This is sufficient to escape special characters for
+  many shells, including most Bourne shell descendants.
+- `replace(s, from, to)` - Replace all occurrences of `from` in `s` to `to`.
+- `replace_regex(s, regex, replacement)` - Replace all occurrences of `regex`
+  in `s` to `replacement`. Regular expressions are provided by the
+  [Rust `regex` crate](https://docs.rs/regex/latest/regex/). See the
+  [syntax documentation](https://docs.rs/regex/latest/regex/#syntax) for usage
+  examples. Capture groups are supported. The `replacement` string uses
+  [Replacement string syntax](https://docs.rs/regex/latest/regex/struct.Regex.html#replacement-string-syntax).
+- `trim(s)` - Remove leading and trailing whitespace from `s`.
+- `trim_end(s)` - Remove trailing whitespace from `s`.
+- `trim_end_match(s, substring)` - Remove suffix of `s` matching `substring`.
+- `trim_end_matches(s, substring)` - Repeatedly remove suffixes of `s` matching
+  `substring`.
+- `trim_start(s)` - Remove leading whitespace from `s`.
+- `trim_start_match(s, substring)` - Remove prefix of `s` matching `substring`.
+- `trim_start_matches(s, substring)` - Repeatedly remove prefixes of `s`
+  matching `substring`.
 
-这些函数可能会失败，例如，如果一个路径没有扩展名，则将停止执行。
+#### Case Conversion
 
-##### 可靠的
+- `capitalize(s)`<sup>1.7.0</sup> - Convert first character of `s` to uppercase
+  and the rest to lowercase.
+- `kebabcase(s)`<sup>1.7.0</sup> - Convert `s` to `kebab-case`.
+- `lowercamelcase(s)`<sup>1.7.0</sup> - Convert `s` to `lowerCamelCase`.
+- `lowercase(s)` - Convert `s` to lowercase.
+- `shoutykebabcase(s)`<sup>1.7.0</sup> - Convert `s` to `SHOUTY-KEBAB-CASE`.
+- `shoutysnakecase(s)`<sup>1.7.0</sup> - Convert `s` to `SHOUTY_SNAKE_CASE`.
+- `snakecase(s)`<sup>1.7.0</sup> - Convert `s` to `snake_case`.
+- `titlecase(s)`<sup>1.7.0</sup> - Convert `s` to `Title Case`.
+- `uppercamelcase(s)`<sup>1.7.0</sup> - Convert `s` to `UpperCamelCase`.
+- `uppercase(s)` - Convert `s` to uppercase.
 
-- `clean(path)` - 通过删除多余的路径分隔符、中间的 `.` 和 `..` 来简化 `path`。`clean("foo//bar")` 结果为 `foo/bar`，`clean("foo/..")` 为 `.`，`clean("foo/./bar")` 结果为 `foo/bar`。
-- `join(a, b…)` - *这个函数在 Unix 上使用 `/`，在 Windows 上使用 `\`，这可能会导致非预期的行为。`/` 操作符，例如，`a / b`，总是使用 `/`，应该被考虑作为替代，除非在 Windows 上特别指定需要 `\`。* 将路径 `a` 和 路径 `b` 拼接在一起。`join("foo/bar", "baz")` 结果为 `foo/bar/baz`。它接受两个或多个参数。
+#### Path Manipulation
 
-#### 文件系统访问
+##### Fallible
 
-- `path_exists(path)` - 如果路径指向一个存在的文件或目录，则返回 `true`，否则返回 `false`。也会遍历符号链接，如果路径无法访问或指向一个无效的符号链接，则返回 `false`。
+- `absolute_path(path)` - Absolute path to relative `path` in the working
+  directory. `absolute_path("./bar.txt")` in directory `/foo` is
+  `/foo/bar.txt`.
+- `canonicalize(path)`<sup>1.24.0</sup> - Canonicalize `path` by resolving symlinks and removing
+  `.`, `..`, and extra `/`s where possible.
+- `extension(path)` - Extension of `path`. `extension("/foo/bar.txt")` is
+  `txt`.
+- `file_name(path)` - File name of `path` with any leading directory components
+  removed. `file_name("/foo/bar.txt")` is `bar.txt`.
+- `file_stem(path)` - File name of `path` without extension.
+  `file_stem("/foo/bar.txt")` is `bar`.
+- `parent_directory(path)` - Parent directory of `path`.
+  `parent_directory("/foo/bar.txt")` is `/foo`.
+- `without_extension(path)` - `path` without extension.
+  `without_extension("/foo/bar.txt")` is `/foo/bar`.
 
-##### 错误报告
+These functions can fail, for example if a path does not have an extension,
+which will halt execution.
 
-- `error(message)` - 终止执行并向用户报告错误 `message`。
+##### Infallible
 
-#### UUID 和哈希值生成
+- `clean(path)` - Simplify `path` by removing extra path separators,
+  intermediate `.` components, and `..` where possible. `clean("foo//bar")` is
+  `foo/bar`, `clean("foo/..")` is `.`, `clean("foo/./bar")` is `foo/bar`.
+- `join(a, b…)` - *This function uses `/` on Unix and `\` on Windows, which can
+  be lead to unwanted behavior. The `/` operator, e.g., `a / b`, which always
+  uses `/`, should be considered as a replacement unless `\`s are specifically
+  desired on Windows.* Join path `a` with path `b`. `join("foo/bar", "baz")` is
+  `foo/bar/baz`. Accepts two or more arguments.
 
-- `sha256(string)` - 以十六进制字符串形式返回 `string` 的 SHA-256 哈希值。
-- `sha256_file(path)` - 以十六进制字符串形式返回 `path` 处的文件的 SHA-256 哈希值。
-- `uuid()` - 返回一个随机生成的 UUID。
+#### Filesystem Access
 
-### 配方属性
+- `path_exists(path)` - Returns `true` if the path points at an existing entity
+  and `false` otherwise. Traverses symbolic links, and returns `false` if the
+  path is inaccessible or points to a broken symlink.
+- `read(path)`<sup>1.39.0</sup> - Returns the content of file at `path` as
+  string.
 
-配方可以通过添加属性注释来改变其行为。
+##### Error Reporting
 
+- `error(message)` - Abort execution and report error `message` to user.
 
-| 名称                                | 描述                                   |
-| ----------------------------------- | -------------------------------------- |
-| `[no-cd]`<sup>1.9.0</sup>           | 在执行配方之前不要改变目录。           |
-| `[no-exit-message]`<sup>1.7.0</sup> | 如果配方执行失败，不要打印错误信息。   |
-| `[linux]`<sup>1.8.0</sup>           | 在Linux上启用配方。                    |
-| `[macos]`<sup>1.8.0</sup>           | 在MacOS上启用配方。                    |
-| `[unix]`<sup>1.8.0</sup>            | 在Unixes上启用配方。                   |
-| `[windows]`<sup>1.8.0</sup>         | 在Windows上启用配方。                  |
-| `[private]`<sup>1.10.0</sup>        | 参见 [私有配方](#私有配方). |
+#### UUID and Hash Generation
 
-#### 启用和禁用配方<sup>1.8.0</sup>
+- `blake3(string)`<sup>1.25.0</sup> - Return [BLAKE3] hash of `string` as hexadecimal string.
+- `blake3_file(path)`<sup>1.25.0</sup> - Return [BLAKE3] hash of file at `path` as hexadecimal
+  string.
+- `sha256(string)` - Return the SHA-256 hash of `string` as hexadecimal string.
+- `sha256_file(path)` - Return SHA-256 hash of file at `path` as hexadecimal
+  string.
+- `uuid()` - Generate a random version 4 UUID.
 
-`[linux]`, `[macos]`, `[unix]` 和 `[windows]` 属性是配置属性。默认情况下，配方总是被启用。一个带有一个或多个配置属性的配方只有在其中一个或多个配置处于激活状态时才会被启用。
+[BLAKE3]: https://github.com/Unity-Billal-mesloub/BLAKE3/
 
-这可以用来编写因运行的操作系统不同，其行为也不同的 `justfile`。以下 `justfile` 中的 `run` 配方将编译和运行 `main.c`，并且根据操作系统的不同而使用不同的C编译器，同时使用正确的二进制产物名称：
+#### Random
+
+- `choose(n, alphabet)`<sup>1.27.0</sup> - Generate a string of `n` randomly
+  selected characters from `alphabet`, which may not contain repeated
+  characters. For example, `choose('64', HEX)` will generate a random
+  64-character lowercase hex string.
+
+#### Datetime
+
+- `datetime(format)`<sup>1.30.0</sup> - Return local time with `format`.
+- `datetime_utc(format)`<sup>1.30.0</sup> - Return UTC time with `format`.
+
+The arguments to `datetime` and `datetime_utc` are `strftime`-style format
+strings, see the
+[`chrono` library docs](https://docs.rs/chrono/latest/chrono/format/strftime/index.html)
+for details.
+
+#### Semantic Versions
+
+- `semver_matches(version, requirement)`<sup>1.16.0</sup> - Check whether a
+  [semantic `version`](https://semver.org), e.g., `"0.1.0"` matches a
+  `requirement`, e.g., `">=0.1.0"`, returning `"true"` if so and `"false"`
+  otherwise.
+
+#### Style
+
+- `style(name)`<sup>1.37.0</sup> - Return a named terminal display attribute
+  escape sequence used by `just`. Unlike terminal display attribute escape
+  sequence constants, which contain standard colors and styles, `style(name)`
+  returns an escape sequence used by `just` itself, and can be used to make
+  recipe output match `just`'s own output.
+
+  Recognized values for `name` are `'command'`, for echoed recipe lines,
+  `error`, and `warning`.
+
+  For example, to style an error message:
+
+  ```just
+  scary:
+    @echo '{{ style("error") }}OH NO{{ NORMAL }}'
+  ```
+
+##### User Directories<sup>1.23.0</sup>
+
+These functions return paths to user-specific directories for things like
+configuration, data, caches, executables, and the user's home directory.
+
+On Unix, these functions follow the
+[XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
+
+On MacOS and Windows, these functions return the system-specified user-specific
+directories. For example, `cache_directory()` returns `~/Library/Caches` on
+MacOS and `{FOLDERID_LocalAppData}` on Windows.
+
+See the [`dirs`](https://docs.rs/dirs/latest/dirs/index.html) crate for more
+details.
+
+- `cache_directory()` - The user-specific cache directory.
+- `config_directory()` - The user-specific configuration directory.
+- `config_local_directory()` - The local user-specific configuration directory.
+- `data_directory()` - The user-specific data directory.
+- `data_local_directory()` - The local user-specific data directory.
+- `executable_directory()` - The user-specific executable directory.
+- `home_directory()` - The user's home directory.
+
+If you would like to use XDG base directories on all platforms you can use the
+`env(…)` function with the appropriate environment variable and fallback,
+although note that the XDG specification requires ignoring non-absolute paths,
+so for full compatibility with spec-compliant applications, you would need to
+do:
+
+```just
+xdg_config_dir := if env('XDG_CONFIG_HOME', '') =~ '^/' {
+  env('XDG_CONFIG_HOME')
+} else {
+  home_directory() / '.config'
+}
+```
+
+### Constants
+
+A number of constants are predefined:
+
+| Name | Value | Value on Windows |
+|---|---|---|
+| `HEX`<sup>1.27.0</sup> | `"0123456789abcdef"` |  |
+| `HEXLOWER`<sup>1.27.0</sup> | `"0123456789abcdef"` |  |
+| `HEXUPPER`<sup>1.27.0</sup> | `"0123456789ABCDEF"` |  |
+| `PATH_SEP`<sup>1.41.0</sup> | `"/"` | `"\"` |
+| `PATH_VAR_SEP`<sup>1.41.0</sup> | `":"` | `";"` |
+| `CLEAR`<sup>1.37.0</sup> | `"\ec"` |  |
+| `NORMAL`<sup>1.37.0</sup> | `"\e[0m"` |  |
+| `BOLD`<sup>1.37.0</sup> | `"\e[1m"` |  |
+| `ITALIC`<sup>1.37.0</sup> | `"\e[3m"` |  |
+| `UNDERLINE`<sup>1.37.0</sup> | `"\e[4m"` |  |
+| `INVERT`<sup>1.37.0</sup> | `"\e[7m"` |  |
+| `HIDE`<sup>1.37.0</sup> | `"\e[8m"` |  |
+| `STRIKETHROUGH`<sup>1.37.0</sup> | `"\e[9m"` |  |
+| `BLACK`<sup>1.37.0</sup> | `"\e[30m"` |  |
+| `RED`<sup>1.37.0</sup> | `"\e[31m"` |  |
+| `GREEN`<sup>1.37.0</sup> | `"\e[32m"` |  |
+| `YELLOW`<sup>1.37.0</sup> | `"\e[33m"` |  |
+| `BLUE`<sup>1.37.0</sup> | `"\e[34m"` |  |
+| `MAGENTA`<sup>1.37.0</sup> | `"\e[35m"` |  |
+| `CYAN`<sup>1.37.0</sup> | `"\e[36m"` |  |
+| `WHITE`<sup>1.37.0</sup> | `"\e[37m"` |  |
+| `BG_BLACK`<sup>1.37.0</sup> | `"\e[40m"` |  |
+| `BG_RED`<sup>1.37.0</sup> | `"\e[41m"` |  |
+| `BG_GREEN`<sup>1.37.0</sup> | `"\e[42m"` |  |
+| `BG_YELLOW`<sup>1.37.0</sup> | `"\e[43m"` |  |
+| `BG_BLUE`<sup>1.37.0</sup> | `"\e[44m"` |  |
+| `BG_MAGENTA`<sup>1.37.0</sup> | `"\e[45m"` |  |
+| `BG_CYAN`<sup>1.37.0</sup> | `"\e[46m"` |  |
+| `BG_WHITE`<sup>1.37.0</sup> | `"\e[47m"` |  |
+
+```just
+@foo:
+  echo {{HEX}}
+```
+
+```console
+$ just foo
+0123456789abcdef
+```
+
+Constants starting with `\e` are
+[ANSI escape sequences](https://en.wikipedia.org/wiki/ANSI_escape_code).
+
+`CLEAR` clears the screen, similar to the `clear` command. The rest are of the
+form `\e[Nm`, where `N` is an integer, and set terminal display attributes.
+
+Terminal display attribute escape sequences can be combined, for example text
+weight `BOLD`, text style `STRIKETHROUGH`, foreground color `CYAN`, and
+background color `BG_BLUE`. They should be followed by `NORMAL`, to reset the
+terminal back to normal.
+
+Escape sequences should be quoted, since `[` is treated as a special character
+by some shells.
+
+```just
+@foo:
+  echo '{{BOLD + STRIKETHROUGH + CYAN + BG_BLUE}}Hi!{{NORMAL}}'
+```
+
+### Attributes
+
+Recipes, `mod` statements, and aliases may be annotated with attributes that
+change their behavior.
+
+| Name | Type | Description |
+|------|------|-------------|
+| `[arg(ARG, help="HELP")]`<sup>1.46.0</sup> | recipe | Print help string `HELP` for `ARG` in usage messages. |
+| `[arg(ARG, long="LONG")]`<sup>1.46.0</sup> | recipe | Require values of argument `ARG` to be passed as `--LONG` option. |
+| `[arg(ARG, short="S")]`<sup>1.46.0</sup> | recipe | Require values of argument `ARG` to be passed as short `-S` option. |
+| `[arg(ARG, value="VALUE")]`<sup>1.46.0</sup> | recipe | Makes option `ARG` a flag which does not take a value. |
+| `[arg(ARG, pattern="PATTERN")]`<sup>1.45.0</sup> | recipe | Require values of argument `ARG` to match regular expression `PATTERN`. |
+| `[confirm]`<sup>1.17.0</sup> | recipe | Require confirmation prior to executing recipe. |
+| `[confirm(PROMPT)]`<sup>1.23.0</sup> | recipe | Require confirmation prior to executing recipe with a custom prompt. |
+| `[default]`<sup>1.43.0</sup> | recipe | Use recipe as module's default recipe. |
+| `[doc(DOC)]`<sup>1.27.0</sup> | module, recipe | Set recipe or module's [documentation comment](#documentation-comments) to `DOC`. |
+| `[env(ENV_VAR, VALUE)]` <sup>master</sup> | recipe | Set environment variables for recipe. |
+| `[extension(EXT)]`<sup>1.32.0</sup> | recipe | Set shebang recipe script's file extension to `EXT`. `EXT` should include a period if one is desired. |
+| `[group(NAME)]`<sup>1.27.0</sup> | module, recipe | Put recipe or module in [group](#groups) `NAME`. |
+| `[linux]`<sup>1.8.0</sup> | recipe | Enable recipe on Linux. |
+| `[macos]`<sup>1.8.0</sup> | recipe | Enable recipe on MacOS. |
+| `[metadata(METADATA)]`<sup>1.42.0</sup> | recipe | Attach `METADATA` to recipe. |
+| `[no-cd]`<sup>1.9.0</sup> | recipe | Don't change directory before executing recipe. |
+| `[no-exit-message]`<sup>1.7.0</sup> | recipe | Don't print an error message if recipe fails. |
+| `[no-quiet]`<sup>1.23.0</sup> | recipe | Override globally quiet recipes and always echo out the recipe. |
+| `[openbsd]`<sup>1.38.0</sup> | recipe | Enable recipe on OpenBSD. |
+| `[parallel]`<sup>1.42.0</sup> | recipe | Run this recipe's dependencies in parallel. |
+| `[positional-arguments]`<sup>1.29.0</sup> | recipe | Turn on [positional arguments](#positional-arguments) for this recipe. |
+| `[private]`<sup>1.10.0</sup> | alias, recipe | Make recipe, alias, or variable private. See [Private Recipes](#private-recipes). |
+| `[script]`<sup>1.33.0</sup> | recipe | Execute recipe as script. See [script recipes](#script-recipes) for more details. |
+| `[script(COMMAND)]`<sup>1.32.0</sup> | recipe | Execute recipe as a script interpreted by `COMMAND`. See [script recipes](#script-recipes) for more details. |
+| `[unix]`<sup>1.8.0</sup> | recipe | Enable recipe on Unixes. (Includes MacOS). |
+| `[windows]`<sup>1.8.0</sup> | recipe | Enable recipe on Windows. |
+| `[working-directory(PATH)]`<sup>1.38.0</sup> | recipe | Set recipe working directory. `PATH` may be relative or absolute. If relative, it is interpreted relative to the default working directory. |
+
+A recipe can have multiple attributes, either on multiple lines:
+
+```just
+[no-cd]
+[private]
+foo:
+    echo "foo"
+```
+
+Or separated by commas on a single line<sup>1.14.0</sup>:
+
+```just
+[no-cd, private]
+foo:
+    echo "foo"
+```
+
+Attributes with a single argument may be written with a colon:
+
+```just
+[group: 'bar']
+foo:
+```
+
+#### Enabling and Disabling Recipes<sup>1.8.0</sup>
+
+The `[linux]`, `[macos]`, `[unix]`, and `[windows]` attributes are
+configuration attributes. By default, recipes are always enabled. A recipe with
+one or more configuration attributes will only be enabled when one or more of
+those configurations is active.
+
+This can be used to write `justfile`s that behave differently depending on
+which operating system they run on. The `run` recipe in this `justfile` will
+compile and run `main.c`, using a different C compiler and using the correct
+output binary name for that compiler depending on the operating system:
 
 ```just
 [unix]
@@ -1280,11 +2204,15 @@ run:
   main.exe
 ```
 
-#### 禁用变更目录<sup>1.9.0</sup>
+#### Disabling Changing Directory<sup>1.9.0</sup>
 
-`just` 通常在执行配方时将当前目录设置为包含 `justfile` 的目录，你可以通过 `[no-cd]` 属性来禁用此行为。这可以用来创建使用调用目录相对路径或者对当前目录进行操作的配方。
+`just` normally executes recipes with the current directory set to the
+directory that contains the `justfile`. This can be disabled using the
+`[no-cd]` attribute. This can be used to create recipes which use paths
+relative to the invocation directory, or which operate on the current
+directory.
 
-例如这个 `commit` 配方：
+For example, this `commit` recipe:
 
 ```just
 [no-cd]
@@ -1293,11 +2221,107 @@ commit file:
   git commit
 ```
 
-可以使用相对于当前目录的路径，因为 `[no-cd]` 可以防止 `just` 在执行 `commit` 配方时改变当前目录。
+Can be used with paths that are relative to the current directory, because
+`[no-cd]` prevents `just` from changing the current directory when executing
+`commit`.
 
-### 使用反引号的命令求值
+#### Requiring Confirmation for Recipes<sup>1.17.0</sup>
 
-反引号可以用来存储命令的求值结果：
+`just` normally executes all recipes unless there is an error. The `[confirm]`
+attribute allows recipes require confirmation in the terminal prior to running.
+This can be overridden by passing `--yes` to `just`, which will automatically
+confirm any recipes marked by this attribute.
+
+Recipes dependent on a recipe that requires confirmation will not be run if the
+relied upon recipe is not confirmed, as well as recipes passed after any recipe
+that requires confirmation.
+
+```just
+[confirm]
+delete-all:
+  rm -rf *
+```
+
+#### Custom Confirmation Prompt<sup>1.23.0</sup>
+
+The default confirmation prompt can be overridden with `[confirm(PROMPT)]`:
+
+```just
+[confirm("Are you sure you want to delete everything?")]
+delete-everything:
+  rm -rf *
+```
+
+### Groups
+
+Recipes and modules may be annotated with one or more group names:
+
+```just
+[group('lint')]
+js-lint:
+    echo 'Running JS linter…'
+
+[group('rust recipes')]
+[group('lint')]
+rust-lint:
+    echo 'Running Rust linter…'
+
+[group('lint')]
+cpp-lint:
+  echo 'Running C++ linter…'
+
+# not in any group
+email-everyone:
+    echo 'Sending mass email…'
+```
+
+Recipes are listed by group:
+
+```
+$ just --list
+Available recipes:
+    email-everyone # not in any group
+
+    [lint]
+    cpp-lint
+    js-lint
+    rust-lint
+
+    [rust recipes]
+    rust-lint
+```
+
+`just --list --unsorted` prints recipes in their justfile order within each group:
+
+```
+$ just --list --unsorted
+Available recipes:
+    (no group)
+    email-everyone # not in any group
+
+    [lint]
+    js-lint
+    rust-lint
+    cpp-lint
+
+    [rust recipes]
+    rust-lint
+```
+
+Groups can be listed with `--groups`:
+
+```
+$ just --groups
+Recipe groups:
+  lint
+  rust recipes
+```
+
+Use `just --groups --unsorted` to print groups in their justfile order.
+
+### Command Evaluation Using Backticks
+
+Backticks can be used to store the result of commands:
 
 ```just
 localhost := `dumpinterfaces | cut -d: -f2 | sed 's/\/.*//' | sed 's/ //g'`
@@ -1306,7 +2330,8 @@ serve:
   ./serve {{localhost}} 8080
 ```
 
-缩进的反引号，以三个反引号为界，与字符串缩进的方式一样，会被去掉缩进：
+Indented backticks, delimited by three backticks, are de-indented in the same
+manner as indented strings:
 
 ````just
 # This backtick evaluates the command `echo foo\necho bar\n`, which produces the value `foo\nbar\n`.
@@ -1316,13 +2341,19 @@ stuff := ```
   ```
 ````
 
-参见 [字符串](#字符串) 部分，了解去除缩进的细节。
+See the [Strings](#strings) section for details on unindenting.
 
-反引号内不能以 `#!` 开头。这种语法是为将来的升级而保留的。
+Backticks may not start with `#!`. This syntax is reserved for a future
+upgrade.
 
-### 条件表达式
+The [`shell(…)` function](#external-commands) provides a more general mechanism
+to invoke external commands, including the ability to execute the contents of a
+variable as a command, and to pass arguments to a command.
 
-`if` / `else` 表达式评估不同的分支，取决于两个表达式是否评估为相同的值：
+### Conditional Expressions
+
+`if`/`else` expressions evaluate different branches depending on if two
+expressions evaluate to the same value:
 
 ```just
 foo := if "2" == "2" { "Good!" } else { "1984" }
@@ -1331,12 +2362,12 @@ bar:
   @echo "{{foo}}"
 ```
 
-```sh
+```console
 $ just bar
 Good!
 ```
 
-也可以用于测试不相等：
+It is also possible to test for inequality:
 
 ```just
 foo := if "hello" != "goodbye" { "xyz" } else { "abc" }
@@ -1345,12 +2376,12 @@ bar:
   @echo {{foo}}
 ```
 
-```sh
+```console
 $ just bar
 xyz
 ```
 
-还支持与正则表达式进行匹配：
+And match against regular expressions:
 
 ```just
 foo := if "hello" =~ 'hel+o' { "match" } else { "mismatch" }
@@ -1359,29 +2390,33 @@ bar:
   @echo {{foo}}
 ```
 
-```sh
+```console
 $ just bar
 match
 ```
 
-正则表达式由 [Regex 包](https://github.com/rust-lang/regex) 提供，其语法在 [docs.rs](https://docs.rs/regex/1.5.4/regex/#syntax) 上有对应文档。由于正则表达式通常使用反斜线转义序列，请考虑使用单引号的字符串字面值，这将使斜线不受干扰地传递给正则分析器。
+Regular expressions are provided by the
+[regex crate](https://github.com/Unity-Billal-mesloub/regex), whose syntax is documented on
+[docs.rs](https://docs.rs/regex/1.5.4/regex/#syntax). Since regular expressions
+commonly use backslash escape sequences, consider using single-quoted string
+literals, which will pass slashes to the regex parser unmolested.
 
-条件表达式是短路的，这意味着它们只评估其中的一个分支。这可以用来确保反引号内的表达式在不应该运行的时候不会运行。
+Conditional expressions short-circuit, which means they only evaluate one of
+their branches. This can be used to make sure that backtick expressions don't
+run when they shouldn't.
 
 ```just
 foo := if env_var("RELEASE") == "true" { `get-something-from-release-database` } else { "dummy-value" }
 ```
 
-条件语句也可以在配方中使用：
+Conditionals can be used inside of recipes:
 
 ```just
 bar foo:
   echo {{ if foo == "bar" { "hello" } else { "goodbye" } }}
 ```
 
-注意最后的 `}` 后面的空格! 没有这个空格，插值将被提前结束。
-
-多个条件语句可以被连起来：
+Multiple conditionals can be chained:
 
 ```just
 foo := if "hello" == "goodbye" {
@@ -1396,14 +2431,14 @@ bar:
   @echo {{foo}}
 ```
 
-```sh
+```console
 $ just bar
 abc
 ```
 
-### 出现错误停止执行
+### Stopping execution with error
 
-可以用 `error` 函数停止执行。比如：
+Execution can be halted with the `error` function. For example:
 
 ```just
 foo := if "hello" == "goodbye" {
@@ -1415,7 +2450,7 @@ foo := if "hello" == "goodbye" {
 }
 ```
 
-在运行时产生以下错误：
+Which produce the following error when run:
 
 ```
 error: Call to function `error` failed: 123
@@ -1423,9 +2458,9 @@ error: Call to function `error` failed: 123
 16 |   error("123")
 ```
 
-### 从命令行设置变量
+### Setting Variables from the Command Line
 
-变量可以从命令行进行覆盖。
+Variables can be overridden from the command line.
 
 ```just
 os := "linux"
@@ -1437,51 +2472,62 @@ build:
   ./build {{os}}
 ```
 
-```sh
+```console
 $ just
 ./build linux
 ./test --test linux
 ```
 
-任何数量的 `NAME=VALUE` 形式的参数都可以在配方前传递：
+Any number of arguments of the form `NAME=VALUE` can be passed before recipes:
 
-```sh
+```console
 $ just os=plan9
 ./build plan9
 ./test --test plan9
 ```
 
-或者你可以使用 `--set` 标志：
+Or you can use the `--set` flag:
 
-```sh
+```console
 $ just --set os bsd
 ./build bsd
 ./test --test bsd
 ```
 
-### 获取和设置环境变量
+### Getting and Setting Environment Variables
 
-#### 导出 `just` 变量
+#### Exporting `just` Variables
 
-以 `export` 关键字为前缀的赋值将作为环境变量导出到配方中：
+Assignments prefixed with the `export` keyword will be exported to recipes as
+environment variables:
 
 ```just
 export RUST_BACKTRACE := "1"
 
 test:
-  # 如果它崩溃了，将打印一个堆栈追踪
+  # will print a stack trace if it crashes
   cargo test
 ```
 
-以 `$` 为前缀的参数将被作为环境变量导出：
+Parameters prefixed with a `$` will be exported as environment variables:
 
 ```just
 test $RUST_BACKTRACE="1":
-  # 如果它崩溃了，将打印一个堆栈追踪
+  # will print a stack trace if it crashes
   cargo test
 ```
 
-导出的变量和参数不会被导出到同一作用域内反引号包裹的表达式里。
+You can also use the `[env(NAME, VALUE)]` attribute to export environment
+variables to a specific recipe:
+
+```just
+[env("RUST_BACKTRACE", "1")]
+test:
+  # will print a stack trace if it crashes
+  cargo test
+```
+
+Exported variables and parameters are not exported to backticks in the same scope.
 
 ```just
 export WORLD := "world"
@@ -1495,34 +2541,51 @@ a $A $B=`echo $A`:
   echo $A $B
 ```
 
-当 [export](#导出) 被设置时，所有的 `just` 变量都将作为环境变量被导出。
+When [export](#export) is set, all `just` variables are exported as environment
+variables.
 
-#### 从环境中获取环境变量
+#### Unexporting Environment Variables<sup>1.29.0</sup>
 
-来自环境的环境变量会自动传递给配方：
+Environment variables can be unexported with the `unexport keyword`:
+
+```just
+unexport FOO
+
+@foo:
+  echo $FOO
+```
+
+```
+$ export FOO=bar
+$ just foo
+sh: FOO: unbound variable
+```
+
+#### Getting Environment Variables from the environment
+
+Environment variables from the environment are passed automatically to the
+recipes.
 
 ```just
 print_home_folder:
   echo "HOME is: '${HOME}'"
 ```
 
-```sh
+```console
 $ just
 HOME is '/home/myuser'
 ```
 
-#### 从 `.env` 文件加载环境变量
+#### Setting `just` Variables from Environment Variables
 
-如果 [dotenv-load](#环境变量加载) 被设置，`just` 将从 `.env` 文件中加载环境变量。该文件中的变量将作为环境变量提供给配方。参见 [环境变量集成](#环境变量加载) 以获得更多信息。
+Environment variables can be propagated to `just` variables using the `env()` function.
+See
+[environment-variables](#environment-variables).
 
-#### 从环境变量中设置 `just` 变量
+### Recipe Parameters
 
-环境变量可以通过函数 `env_var()` 和 `env_var_or_default()` 传入到 `just` 变量。
-参见 [environment-variables](#环境变量)。
-
-### 配方参数
-
-配方可以有参数。这里的配方 `build` 有一个参数叫 `target`:
+Recipes may have parameters. Here recipe `build` has a parameter called
+`target`:
 
 ```just
 build target:
@@ -1530,15 +2593,16 @@ build target:
   cd {{target}} && make
 ```
 
-要在命令行上传递参数，请把它们放在配方名称后面：
+To pass arguments on the command line, put them after the recipe name:
 
-```sh
+```console
 $ just build my-awesome-project
 Building my-awesome-project…
 cd my-awesome-project && make
 ```
 
-要向依赖配方传递参数，请将依赖配方和参数一起放在括号里：
+To pass arguments to a dependency, put the dependency in parentheses along with
+the arguments:
 
 ```just
 default: (build "main")
@@ -1548,7 +2612,7 @@ build target:
   cd {{target}} && make
 ```
 
-变量也可以作为参数传递给依赖：
+Variables can also be passed as arguments to dependencies:
 
 ```just
 target := "main"
@@ -1560,7 +2624,8 @@ _build version:
 build: (_build target)
 ```
 
-命令的参数可以通过将依赖与参数一起放在括号中的方式传递给依赖：
+A command's arguments can be passed to dependency by putting the dependency in
+parentheses along with the arguments:
 
 ```just
 build target:
@@ -1570,7 +2635,7 @@ push target: (build target)
   @echo 'Pushing {{target}}…'
 ```
 
-参数可以有默认值：
+Parameters may have default values:
 
 ```just
 default := 'all'
@@ -1580,23 +2645,24 @@ test target tests=default:
   ./test --tests {{tests}} {{target}}
 ```
 
-有默认值的参数可以省略：
+Parameters with default values may be omitted:
 
-```sh
+```console
 $ just test server
 Testing server:all…
 ./test --tests all server
 ```
 
-或者提供：
+Or supplied:
 
-```sh
+```console
 $ just test server unit
 Testing server:unit…
 ./test --tests unit server
 ```
 
-默认值可以是任意的表达式，但字符串或路径拼接必须放在括号内：
+Default values may be arbitrary expressions, but expressions containing the
+`+`, `&&`, `||`, or `/` operators must be parenthesized:
 
 ```just
 arch := "wasm"
@@ -1605,70 +2671,319 @@ test triple=(arch + "-unknown-unknown") input=(arch / "input.dat"):
   ./test {{triple}}
 ```
 
-配方的最后一个参数可以是变长的，在参数名称前用 `+` 或 `*` 表示：
+The last parameter of a recipe may be variadic, indicated with either a `+` or
+a `*` before the argument name:
 
 ```just
 backup +FILES:
   scp {{FILES}} me@server.com:
 ```
 
-以 `+` 为前缀的变长参数接受 _一个或多个_ 参数，并展开为一个包含这些参数的字符串，以空格分隔：
+Variadic parameters prefixed with `+` accept _one or more_ arguments and expand
+to a string containing those arguments separated by spaces:
 
-```sh
+```console
 $ just backup FAQ.md GRAMMAR.md
 scp FAQ.md GRAMMAR.md me@server.com:
 FAQ.md                  100% 1831     1.8KB/s   00:00
 GRAMMAR.md              100% 1666     1.6KB/s   00:00
 ```
 
-以 `*` 为前缀的变长参数接受 _0个或更多_ 参数，并展开为一个包含这些参数的字符串，以空格分隔，如果没有参数，则为空字符串：
+Variadic parameters prefixed with `*` accept _zero or more_ arguments and
+expand to a string containing those arguments separated by spaces, or an empty
+string if no arguments are present:
 
 ```just
 commit MESSAGE *FLAGS:
   git commit {{FLAGS}} -m "{{MESSAGE}}"
 ```
 
-变长参数可以被分配默认值。这些参数被命令行上传递的参数所覆盖：
+Variadic parameters can be assigned default values. These are overridden by
+arguments passed on the command line:
 
 ```just
 test +FLAGS='-q':
   cargo test {{FLAGS}}
 ```
 
-`{{…}}` 的替换可能需要加引号，如果它们包含空格。例如，如果你有以下配方：
+`{{…}}` substitutions may need to be quoted if they contain spaces. For
+example, if you have the following recipe:
 
 ```just
 search QUERY:
   lynx https://www.google.com/?q={{QUERY}}
 ```
 
-然后你输入：
+And you type:
 
-```sh
+```console
 $ just search "cat toupee"
 ```
 
-`just` 将运行 `lynx https://www.google.com/?q=cat toupee` 命令，这将被 `sh` 解析为`lynx`、`https://www.google.com/?q=cat` 和 `toupee`，而不是原来的 `lynx` 和 `https://www.google.com/?q=cat toupee`。
+`just` will run the command `lynx https://www.google.com/?q=cat toupee`, which
+will get parsed by `sh` as `lynx`, `https://www.google.com/?q=cat`, and
+`toupee`, and not the intended `lynx` and `https://www.google.com/?q=cat toupee`.
 
-你可以通过添加引号来解决这个问题：
+You can fix this by adding quotes:
 
 ```just
 search QUERY:
   lynx 'https://www.google.com/?q={{QUERY}}'
 ```
 
-以 `$` 为前缀的参数将被作为环境变量导出：
+Parameters prefixed with a `$` will be exported as environment variables:
 
 ```just
 foo $bar:
   echo $bar
 ```
 
-### 在配方的末尾运行配方
+Parameters may be constrained to match regular expression patterns using the
+`[arg("name", pattern="pattern")]` attribute<sup>1.45.0</sup>:
 
-一个配方的正常依赖总是在配方开始之前运行。也就是说，被依赖方总是在依赖方之前运行。这些依赖被称为 "前期依赖"。
+```just
+[arg('n', pattern='\d+')]
+double n:
+  echo $(({{n}} * 2))
+```
 
-一个配方也可以有后续的依赖，它们在配方之后运行，用 `&&` 表示：
+A leading `^` and trailing `$` are added to the pattern, so it must match the
+entire argument value.
+
+You may constrain the pattern to a number of alternatives using the `|`
+operator:
+
+```just
+[arg('flag', pattern='--help|--version')]
+info flag:
+  just {{flag}}
+```
+
+Regular expressions are provided by the
+[Rust `regex` crate](https://docs.rs/regex/latest/regex/). See the
+[syntax documentation](https://docs.rs/regex/latest/regex/#syntax) for usage
+examples.
+
+Usage information for a recipe may be printed with the `--usage`
+subcommand<sup>1.46.0</sup>:
+
+```console
+$ just --usage foo
+Usage: just foo [OPTIONS] bar
+
+Arguments:
+  bar
+```
+
+Help strings may be added to arguments using the `[arg(ARG, help=HELP)]` attribute:
+
+```just
+[arg("bar", help="hello")]
+foo bar:
+```
+
+```console
+$ just --usage foo
+Usage: just foo bar
+
+Arguments:
+  bar hello
+```
+
+#### Recipe Flags and Options
+
+Recipe parameters are positional by default.
+
+In this `justfile`:
+
+```just
+@foo bar:
+  echo bar={{bar}}
+```
+
+The parameter `bar` is positional:
+
+```console
+$ just foo hello
+bar=hello
+```
+
+The `[arg(ARG, long=OPTION)]`<sup>1.46.0</sup> attribute can be used to make a
+parameter a long option.
+
+In this `justfile`:
+
+```just
+[arg("bar", long="bar")]
+foo bar:
+```
+
+The parameter `bar` is given with the `--bar` option:
+
+```console
+$ just foo --bar hello
+bar=hello
+```
+
+Options may also be passed with `--name=value` syntax:
+
+```console
+$ just foo --bar=hello
+bar=hello
+```
+
+The value of `long` can be omitted, in which case the option defaults to the
+name of the parameter:
+
+```just
+[arg("bar", long)]
+foo bar:
+```
+
+The `[arg(ARG, short=OPTION)]`<sup>1.46.0</sup> attribute can be used to make a
+parameter a short option.
+
+In this `justfile`:
+
+```just
+[arg("bar", short="b")]
+foo bar:
+```
+
+The parameter `bar` is given with the `-b` option:
+
+```console
+$ just foo -b hello
+bar=hello
+```
+
+If a parameter has both a long and short option, it may be passed using either.
+
+Variadic `+` and `?` parameters cannot be options.
+
+The `[arg(ARG, value=VALUE, …)]`<sup>1.46.0</sup> attribute can be used with
+`long` or `short` to make a parameter a flag which does not take a value.
+
+In this `justfile`:
+
+```just
+[arg("bar", long="bar", value="hello")]
+foo bar:
+```
+
+The parameter `bar` is given with the `--bar` option, but does not take a
+value, and instead takes the value given in the `[arg]` attribute:
+
+```console
+$ just foo --bar
+bar=hello
+```
+
+This is useful for unconditionally requiring a flag like `--force` on dangerous
+commands.
+
+A flag is optional if its parameter has a default:
+
+```just
+[arg("bar", long="bar", value="hello")]
+foo bar="goodbye":
+```
+
+Causing it to receive the default when not passed in the invocation:
+
+```console
+$ just foo
+bar=goodbye
+```
+
+### Dependencies
+
+Dependencies run before recipes that depend on them:
+
+```just
+a: b
+  @echo A
+
+b:
+  @echo B
+```
+
+```
+$ just a
+B
+A
+```
+
+In a given invocation of `just`, a recipe with the same arguments will only run
+once, regardless of how many times it appears in the command-line invocation,
+or how many times it appears as a dependency:
+
+```just
+a:
+  @echo A
+
+b: a
+  @echo B
+
+c: a
+  @echo C
+```
+
+```
+$ just a a a a a
+A
+$ just b c
+A
+B
+C
+```
+
+Multiple recipes may depend on a recipe that performs some kind of setup, and
+when those recipes run, that setup will only be performed once:
+
+```just
+build:
+  cc main.c
+
+test-foo: build
+  ./a.out --test foo
+
+test-bar: build
+  ./a.out --test bar
+```
+
+```
+$ just test-foo test-bar
+cc main.c
+./a.out --test foo
+./a.out --test bar
+```
+
+Recipes in a given run are only skipped when they receive the same arguments:
+
+```just
+build:
+  cc main.c
+
+test TEST: build
+  ./a.out --test {{TEST}}
+```
+
+```
+$ just test foo test bar
+cc main.c
+./a.out --test foo
+./a.out --test bar
+```
+
+#### Running Recipes at the End of a Recipe
+
+Normal dependencies of a recipes always run before a recipe starts. That is to
+say, the dependee always runs before the depender. These dependencies are
+called "prior dependencies".
+
+A recipe can also have subsequent dependencies, which run immediately after the
+recipe and are introduced with an `&&`:
 
 ```just
 a:
@@ -1684,9 +2999,9 @@ d:
   echo 'D!'
 ```
 
-…运行 _b_ 输出：
+…running _b_ prints:
 
-```sh
+```console
 $ just b
 echo 'A!'
 A!
@@ -1698,9 +3013,11 @@ echo 'D!'
 D!
 ```
 
-### 在配方中间运行配方
+#### Running Recipes in the Middle of a Recipe
 
-`just` 不支持在配方的中间运行另一个配方，但你可以在一个配方的中间递归调用 `just`。例如以下 `justfile`：
+`just` doesn't support running recipes in the middle of another recipe, but you
+can call `just` recursively in the middle of a recipe. Given the following
+`justfile`:
 
 ```just
 a:
@@ -1715,9 +3032,9 @@ c:
   echo 'C!'
 ```
 
-…运行 _b_ 输出：
+…running _b_ prints:
 
-```sh
+```console
 $ just b
 echo 'A!'
 A!
@@ -1729,11 +3046,15 @@ echo 'B end!'
 B end!
 ```
 
-这有局限性，因为配方 `c` 是以一个全新的 `just` 调用来运行的，赋值将被重新计算，依赖可能会运行两次，命令行参数不会被传入到子 `just` 进程。
+This has limitations, since recipe `c` is run with an entirely new invocation
+of `just`: Assignments will be recalculated, dependencies might run twice, and
+command line arguments will not be propagated to the child `just` process.
 
-### 用其他语言书写配方
+### Shebang Recipes
 
-以 `#!` 开头的配方被称为 Shebang 配方，它通过将配方主体保存到文件中并运行它来执行。这让你可以用不同的语言来编写配方：
+Recipes that start with `#!` are called shebang recipes, and are executed by
+saving the recipe body to a file and running it. This lets you write recipes in
+different languages:
 
 ```just
 polyglot: python js perl sh ruby nu
@@ -1765,7 +3086,7 @@ ruby:
   puts "Hello from ruby!"
 ```
 
-```sh
+```console
 $ just polyglot
 Hello from python!
 Greetings from JavaScript!
@@ -1775,13 +3096,107 @@ Hola from a nushell script!
 Hello from ruby!
 ```
 
-在类似 Unix 的操作系统中，包括 Linux 和 MacOS，Shebang 配方的执行方式是将配方主体保存到临时目录下的一个文件中，将该文件标记为可执行文件，然后执行它。操作系统将 Shebang 行解析为一个命令行并调用它，包括文件的路径。例如，如果一个配方以 `#!/usr/bin/env bash` 开头，操作系统运行的最终命令将是 `/usr/bin/env bash /tmp/PATH_TO_SAVED_RECIPE_BODY` 之类。请记住，不同的操作系统对 Shebang 行的分割方式不同。
+On Unix-like operating systems, including Linux and MacOS, shebang recipes are
+executed by saving the recipe body to a file in a temporary directory, marking
+the file as executable, and executing it. The OS then parses the shebang line
+into a command line and invokes it, including the path to the file. For
+example, if a recipe starts with `#!/usr/bin/env bash`, the final command that
+the OS runs will be something like `/usr/bin/env bash
+/tmp/PATH_TO_SAVED_RECIPE_BODY`.
 
-Windows 不支持 Shebang 行。在 Windows 上，`just` 将 Shebang 行分割成命令和参数，将配方主体保存到一个文件中，并调用分割后的命令和参数，同时将保存的配方主体的路径作为最后一个参数。
+Shebang line splitting is operating system dependent. When passing a command
+with arguments, you may need to tell `env` to split them explicitly by using
+the `-S` flag:
 
-### 更加安全的 Bash Shebang 配方
+```just
+run:
+  #!/usr/bin/env -S bash -x
+  ls
+```
 
-如果你正在写一个 `bash` Shebang 配方，考虑加入 `set -euxo pipefail`：
+Windows does not support shebang lines. On Windows, `just` splits the shebang
+line into a command and arguments, saves the recipe body to a file, and invokes
+the split command and arguments, adding the path to the saved recipe body as
+the final argument. For example, on Windows, if a recipe starts with `#! py`,
+the final command the OS runs will be something like
+`py C:\Temp\PATH_TO_SAVED_RECIPE_BODY`.
+
+### Script Recipes
+
+Recipes with a `[script(COMMAND)]`<sup>1.32.0</sup> attribute are run as
+scripts interpreted by `COMMAND`. This avoids some of the issues with shebang
+recipes, such as the use of `cygpath` on Windows, the need to use
+`/usr/bin/env`, inconsistencies in shebang line splitting across Unix OSs, and
+requiring a temporary directory from which files can be executed.
+
+Recipes with an empty `[script]` attribute are executed with the value of `set
+script-interpreter := […]`<sup>1.33.0</sup>, defaulting to `sh -eu`, and *not*
+the value of `set shell`.
+
+The body of the recipe is evaluated, written to disk in the temporary
+directory, and run by passing its path as an argument to `COMMAND`.
+
+### Script and Shebang Recipe Temporary Files
+
+Both script and shebang recipes write the recipe body to a temporary file for
+execution. Script recipes execute that file by passing it to a command, while
+shebang recipes execute the file directly. Shebang recipe execution will fail
+if the filesystem containing the temporary file is mounted with `noexec` or is
+otherwise non-executable.
+
+The directory that `just` writes temporary files to may be configured in a
+number of ways, from highest to lowest precedence:
+
+- Globally with the `--tempdir` command-line option or the `JUST_TEMPDIR`
+  environment variable<sup>1.41.0</sup>.
+
+- On a per-module basis with the `tempdir` setting.
+
+- Globally on Linux with the `XDG_RUNTIME_DIR` environment variable.
+
+- Falling back to the directory returned by
+  [std::env::temp_dir](https://doc.rust-lang.org/std/env/fn.temp_dir.html).
+
+### Python Recipes with `uv`
+
+[`uv`](https://github.com/Unity-Billal-mesloub/uv) is an excellent cross-platform python
+project manager, written in Rust.
+
+Using the `[script]` attribute and `script-interpreter` setting, `just` can
+easily be configured to run Python recipes with `uv`:
+
+```just
+set unstable
+
+set script-interpreter := ['uv', 'run', '--script']
+
+[script]
+hello:
+  print("Hello from Python!")
+
+[script]
+goodbye:
+  # /// script
+  # requires-python = ">=3.11"
+  # dependencies=["sh"]
+  # ///
+  import sh
+  print(sh.echo("Goodbye from Python!"), end='')
+```
+
+Of course, a shebang also works:
+
+```just
+hello:
+  #!/usr/bin/env -S uv run --script
+  print("Hello from Python!")
+```
+
+
+### Safer Bash Shebang Recipes
+
+If you're writing a `bash` shebang recipe, consider adding `set -euxo
+pipefail`:
 
 ```just
 foo:
@@ -1791,23 +3206,28 @@ foo:
   echo "$hello from Bash!"
 ```
 
-严格意义上说这不是必须的，但是 `set -euxo pipefail` 开启了一些有用的功能，使 `bash` Shebang 配方的行为更像正常的、行式的 `just` 配方:
+It isn't strictly necessary, but `set -euxo pipefail` turns on a few useful
+features that make `bash` shebang recipes behave more like normal, linewise
+`just` recipe:
 
-- `set -e` 使 `bash` 在命令失败时退出。
+- `set -e` makes `bash` exit if a command fails.
 
-- `set -u` 使 `bash` 在变量未定义时退出。
+- `set -u` makes `bash` exit if a variable is undefined.
 
-- `set -x` 使 `bash` 在运行前打印每一行脚本。
+- `set -x` makes `bash` print each script line before it's run.
 
-- `set -o pipefail` 使 `bash` 在管道中的一个命令失败时退出。这是 `bash` 特有的，所以在普通的行式 `just` 配方中没有开启。
+- `set -o pipefail` makes `bash` exit if a command in a pipeline fails. This is
+  `bash`-specific, so isn't turned on in normal linewise `just` recipes.
 
-这些措施共同避免了很多 Shell 脚本的问题。
+Together, these avoid a lot of shell scripting gotchas.
 
-#### 在 Windows 上执行 Shebang 配方
+#### Shebang Recipe Execution on Windows
 
-在 Windows 上，包含 `/` 的 Shebang 解释器路径通过 `cygpath` 从 Unix 风格的路径转换为 Windows 风格的路径，该工具随 [Cygwin](http://www.cygwin.com) 一起提供。
+On Windows, shebang interpreter paths containing a `/` are translated from
+Unix-style paths to Windows-style paths using `cygpath`, a utility that ships
+with [Cygwin](http://www.cygwin.com).
 
-例如，要在 Windows 上执行这个配方：
+For example, to execute this recipe on Windows:
 
 ```just
 echo:
@@ -1815,30 +3235,38 @@ echo:
   echo "Hello!"
 ```
 
-解释器路径 `/bin/sh` 在执行前将被 `cygpath` 翻译成 Windows 风格的路径。
+The interpreter path `/bin/sh` will be translated to a Windows-style path using
+`cygpath` before being executed.
 
-如果解释器路径不包含 `/`，它将被执行而不被翻译。这主要用于 `cygpath` 不可用或者你希望向解释器传递一个 Windows 风格的路径的情况下。
+If the interpreter path does not contain a `/` it will be executed without
+being translated. This is useful if `cygpath` is not available, or you wish to
+pass a Windows-style path to the interpreter.
 
-### 在配方中设置变量
+### Setting Variables in a Recipe
 
-配方代码行是由 Shell 解释的，而不是 `just`，所以不可能在配方中设置 `just` 变量：
+Recipe lines are interpreted by the shell, not `just`, so it's not possible to
+set `just` variables in the middle of a recipe:
 
-```mf
+```justfile
 foo:
   x := "hello" # This doesn't work!
   echo {{x}}
 ```
 
-使用 Shell 变量是可能的，但还有一个问题：每一行配方都由一个新的 Shell 实例运行，所以在一行中设置的变量不会在下一行中生效：
+It is possible to use shell variables, but there's another problem. Every
+recipe line is run by a new shell instance, so variables set in one line won't
+be set in the next:
 
 ```just
 foo:
-  x=hello && echo $x # 这个没问题！
+  x=hello && echo $x # This works!
   y=bye
-  echo $y            # 这个是有问题的, `y` 在此处未定义!
+  echo $y            # This doesn't, `y` is undefined here!
 ```
 
-解决这个问题的最好方法是使用 Shebang 配方。Shebang 配方体被提取出来并作为脚本运行，所以一个 Shell 实例就可以运行整个配方体：
+The best way to work around this is to use a shebang recipe. Shebang recipe
+bodies are extracted and run as scripts, so a single shell instance will run
+the whole thing:
 
 ```just
 foo:
@@ -1848,13 +3276,17 @@ foo:
   echo $x
 ```
 
-### 在配方之间共享环境变量
+### Sharing Environment Variables Between Recipes
 
-每个配方的每一行都由一个新的shell执行，所以不可能在配方之间共享环境变量。
+Each line of each recipe is executed by a fresh shell, so it is not possible to
+share environment variables between recipes.
 
-#### 使用 Python 虚拟环境
+#### Using Python Virtual Environments
 
-一些工具，像 [Python 的 venv](https://docs.python.org/3/library/venv.html)，需要加载环境变量才能工作，这使得它们在使用 `just` 时具有挑战性。作为一种变通方法，你可以直接执行虚拟环境二进制文件：
+Some tools, like [Python's venv](https://docs.python.org/3/library/venv.html),
+require loading environment variables in order to work, making them challenging
+to use with `just`. As a workaround, you can execute the virtual environment
+binaries directly:
 
 ```just
 venv:
@@ -1864,9 +3296,10 @@ run: venv
   ./foo/bin/python3 main.py
 ```
 
-### 改变配方中的工作目录
+### Changing the Working Directory in a Recipe
 
-每一行配方都由一个新的 Shell 执行，所以如果你在某一行改变了工作目录，对后面的行不会有影响：
+Each recipe line is executed by a new shell, so if you change the working
+directory on one line, it won't have an effect on later lines:
 
 ```just
 foo:
@@ -1875,14 +3308,17 @@ foo:
   pwd    # …as this `pwd`!
 ```
 
-有几个方法可以解决这个问题。一个是在你想运行的命令的同一行调用 `cd`：
+There are a couple ways around this. One is to call `cd` on the same line as
+the command you want to run:
 
 ```just
 foo:
   cd bar && pwd
 ```
 
-另一种方法是使用 Shebang 配方。Shebang 配方体被提取并作为脚本运行，因此一个 Shell 实例将运行整个配方体，所以一行的 `pwd` 改变将影响后面的行，就像一个 Shell 脚本：
+The other is to use a shebang recipe. Shebang recipe bodies are extracted and
+run as scripts, so a single shell instance will run the whole thing, and thus a
+`cd` on one line will affect later lines, just like a shell script:
 
 ```just
 foo:
@@ -1892,26 +3328,68 @@ foo:
   pwd
 ```
 
-### 缩进
+### Indentation
 
-配方代码行可以用空格或制表符缩进，但不能两者混合使用。一个配方的所有行必须有相同的缩进，但同一 `justfile` 中的不同配方可以使用不同的缩进。
+Recipe lines can be indented with spaces or tabs, but not a mix of both. All of
+a recipe's lines must have the same type of indentation, but different recipes
+in the same `justfile` may use different indentation.
 
-### 多行结构
+Each recipe must be indented at least one level from the `recipe-name` but
+after that may be further indented.
 
-没有初始 Shebang 的配方会被逐行评估和运行，这意味着多行结构可能不会像你预期的那样工作。
+Here's a justfile with a recipe indented with spaces, represented as `·`, and
+tabs, represented as `→`.
 
-例如对于下面的 `justfile`：
+```justfile
+set windows-shell := ["pwsh", "-NoLogo", "-NoProfileLoadTime", "-Command"]
 
-```mf
+set ignore-comments
+
+list-space directory:
+··#!pwsh
+··foreach ($item in $(Get-ChildItem {{directory}} )) {
+····echo $item.Name
+··}
+··echo ""
+
+# indentation nesting works even when newlines are escaped
+list-tab directory:
+→ @foreach ($item in $(Get-ChildItem {{directory}} )) { \
+→ → echo $item.Name \
+→ }
+→ @echo ""
+```
+
+```pwsh
+PS > just list-space ~
+Desktop
+Documents
+Downloads
+
+PS > just list-tab ~
+Desktop
+Documents
+Downloads
+```
+
+### Multi-Line Constructs
+
+Recipes without an initial shebang are evaluated and run line-by-line, which
+means that multi-line constructs probably won't do what you want.
+
+For example, with the following `justfile`:
+
+```justfile
 conditional:
   if true; then
     echo 'True!'
   fi
 ```
 
-在 `conditional` 配方的第二行前有额外的前导空格，会产生一个解析错误：
+The extra leading whitespace before the second line of the `conditional` recipe
+will produce a parse error:
 
-```sh
+```console
 $ just conditional
 error: Recipe line has extra leading whitespace
   |
@@ -1919,9 +3397,11 @@ error: Recipe line has extra leading whitespace
   |     ^^^^^^^^^^^^^^^^
 ```
 
-为了解决这个问题，你可以在一行上写条件，用斜线转义换行，或者在你的配方中添加一个 Shebang。我们提供了一些多行结构的例子可供参考。
+To work around this, you can write conditionals on one line, escape newlines
+with slashes, or add a shebang to your recipe. Some examples of multi-line
+constructs are provided for reference.
 
-#### `if` 语句
+#### `if` statements
 
 ```just
 conditional:
@@ -1943,7 +3423,7 @@ conditional:
   fi
 ```
 
-#### `for` 循环
+#### `for` loops
 
 ```just
 for:
@@ -1965,7 +3445,7 @@ for:
   done
 ```
 
-#### `while` 循环
+#### `while` loops
 
 ```just
 while:
@@ -1987,11 +3467,72 @@ while:
   done
 ```
 
-### 命令行选项
+#### Outside Recipe Bodies
 
-`just` 提供了一些有用的命令行选项，用于列出、Dump 和调试配方以及变量：
+Parenthesized expressions can span multiple lines:
 
-```sh
+```just
+abc := ('a' +
+        'b'
+         + 'c')
+
+abc2 := (
+  'a' +
+  'b' +
+  'c'
+)
+
+foo param=('foo'
+      + 'bar'
+    ):
+  echo {{param}}
+
+bar: (foo
+        'Foo'
+     )
+  echo 'Bar!'
+```
+
+Lines ending with a backslash continue on to the next line as if the lines were
+joined by whitespace<sup>1.15.0</sup>:
+
+```just
+a := 'foo' + \
+     'bar'
+
+foo param1 \
+  param2='foo' \
+  *varparam='': dep1 \
+                (dep2 'foo')
+  echo {{param1}} {{param2}} {{varparam}}
+
+dep1: \
+    # this comment is not part of the recipe body
+  echo 'dep1'
+
+dep2 \
+  param:
+    echo 'Dependency with parameter {{param}}'
+```
+
+Backslash line continuations can also be used in interpolations. The line
+following the backslash must be indented.
+
+```just
+recipe:
+  echo '{{ \
+  "This interpolation " + \
+    "has a lot of text." \
+  }}'
+  echo 'back to recipe body'
+```
+
+### Command-line Options
+
+`just` supports a number of useful command-line options for listing, dumping,
+and debugging recipes and variables:
+
+```console
 $ just --list
 Available recipes:
   js
@@ -2007,11 +3548,33 @@ $ just --show polyglot
 polyglot: python js perl sh ruby
 ```
 
-可以通过 `just --help` 命令查看所有选项。
+#### Setting Command-line Options with Environment Variables
 
-### 私有配方
+Some command-line options can be set with environment variables
 
-名字以 `_` 开头的配方和别名将在 `just --list` 中被忽略：
+For example, unstable features can be enabled either with the `--unstable`
+flag:
+
+```console
+$ just --unstable
+```
+
+Or by setting the `JUST_UNSTABLE` environment variable:
+
+```console
+$ export JUST_UNSTABLE=1
+$ just
+```
+
+Since environment variables are inherited by child processes, command-line
+options set with environment variables are inherited by recursive invocations
+of `just`, where as command line options set with arguments are not.
+
+Consult `just --help` for which options can be set with environment variables.
+
+### Private Recipes
+
+Recipes and aliases whose name starts with a `_` are omitted from `just --list`:
 
 ```just
 test: _test-helper
@@ -2021,20 +3584,21 @@ _test-helper:
   ./bin/super-secret-test-helper-stuff
 ```
 
-```sh
+```console
 $ just --list
 Available recipes:
     test
 ```
 
-`just --summary` 亦然：
+And from `just --summary`:
 
-```sh
+```console
 $ just --summary
 test
 ```
 
-`[private]` 属性<sup>1.10.0</sup>也可用于隐藏配方，而不需要改变名称：
+The `[private]` attribute<sup>1.10.0</sup> may also be used to hide recipes or
+aliases without needing to change the name:
 
 ```just
 [private]
@@ -2046,17 +3610,19 @@ alias b := bar
 bar:
 ```
 
-```sh
+```console
 $ just --list
 Available recipes:
     bar
 ```
 
-这对那些只作为其他配方的依赖使用的辅助配方很有用。
+This is useful for helper recipes which are only meant to be used as
+dependencies of other recipes.
 
-### 安静配方
+### Quiet Recipes
 
-配方名称可在前面加上 `@`，可以在每行反转行首 `@` 的含义：
+A recipe name may be prefixed with `@` to invert the meaning of `@` before each
+line:
 
 ```just
 @quiet:
@@ -2065,16 +3631,41 @@ Available recipes:
   @# all done!
 ```
 
-现在只有以 `@` 开头的行才会被回显：
+Now only the lines starting with `@` will be echoed:
 
-```sh
-$ j quiet
+```console
+$ just quiet
 hello
 goodbye
 # all done!
 ```
 
-Shebang 配方默认是安静的：
+All recipes in a Justfile can be made quiet with `set quiet`:
+
+```just
+set quiet
+
+foo:
+  echo "This is quiet"
+
+@foo2:
+  echo "This is also quiet"
+```
+
+The `[no-quiet]` attribute overrides this setting:
+
+```just
+set quiet
+
+foo:
+  echo "This is quiet"
+
+[no-quiet]
+foo2:
+  echo "This is not quiet"
+```
+
+Shebang recipes are quiet by default:
 
 ```just
 foo:
@@ -2082,12 +3673,13 @@ foo:
   echo 'Foo!'
 ```
 
-```sh
+```console
 $ just foo
 Foo!
 ```
 
-在 Shebang 配方名称前面添加 `@`，使 `just` 在执行配方前打印该配方：
+Adding `@` to a shebang recipe name makes `just` print the recipe before
+executing it:
 
 ```just
 @bar:
@@ -2095,27 +3687,30 @@ Foo!
   echo 'Bar!'
 ```
 
-```sh
+```console
 $ just bar
 #!/usr/bin/env bash
 echo 'Bar!'
 Bar!
 ```
 
-`just` 在配方行失败时通常会打印错误信息，这些错误信息可以通过 `[no-exit-message]`<sup>1.7.0</sup> 属性来抑制。你可能会发现这在包装工具的配方中特别有用：
+`just` normally prints error messages when a recipe line fails. These error
+messages can be suppressed using the `[no-exit-message]`<sup>1.7.0</sup>
+attribute. You may find this especially useful with a recipe that wraps a tool:
 
 ```just
 git *args:
     @git {{args}}
 ```
 
-```sh
+```console
 $ just git status
 fatal: not a git repository (or any of the parent directories): .git
 error: Recipe `git` failed on line 2 with exit code 128
 ```
 
-添加属性，当工具以非零代码退出时抑制退出错误信息：
+Add the attribute to suppress the exit error message when the tool exits with a
+non-zero code:
 
 ```just
 [no-exit-message]
@@ -2123,59 +3718,300 @@ git *args:
     @git {{args}}
 ```
 
-```sh
+```console
 $ just git status
 fatal: not a git repository (or any of the parent directories): .git
 ```
 
-### 通过交互式选择器选择要运行的配方
+### Selecting Recipes to Run With an Interactive Chooser
 
-`--choose` 子命令可以使 `just` 唤起一个选择器来让您选择要运行的配方。选择器应该从标准输入中读取包含配方名称的行，并将其中一个或多个用空格分隔的名称打印到标准输出。
+The `--choose` subcommand makes `just` invoke a chooser to select which recipes
+to run. Choosers should read lines containing recipe names from standard input
+and print one or more of those names separated by spaces to standard output.
 
-因为目前没有办法通过 `--choose` 运行一个需要传入参数的配方，所以这样的配方将不会在选择器中列出。另外，私有配方和别名也会被忽略。
+Because there is currently no way to run a recipe that requires arguments with
+`--choose`, such recipes will not be given to the chooser. Private recipes and
+aliases are also skipped.
 
-选择器可以用 `--chooser` 标志来覆写。如果 `--chooser` 没有给出，那么 `just` 首先检查 `$JUST_CHOOSER` 是否被设置。如果没有，那么将使用默认选择器 `fzf`，这是一个流行的模糊查找器。
+The chooser can be overridden with the `--chooser` flag. If `--chooser` is not
+given, then `just` first checks if `$JUST_CHOOSER` is set. If it isn't, then
+the chooser defaults to `fzf`, a popular fuzzy finder.
 
-参数可以包含在选择器中，例如：`fzf --exact`。
+Arguments can be included in the chooser, i.e. `fzf --exact`.
 
-选择器的调用方式与配方行的调用方式相同。例如，如果选择器是 `fzf`，它将被通过 `sh -cu 'fzf'` 调用，如果 Shell 或 Shell 参数被覆写，选择器的调用将尊重这些覆写。
+The chooser is invoked in the same way as recipe lines. For example, if the
+chooser is `fzf`, it will be invoked with `sh -cu 'fzf'`, and if the shell, or
+the shell arguments are overridden, the chooser invocation will respect those
+overrides.
 
-如果你希望 `just` 默认用选择器来选择配方，你可以用这个作为你的默认配方：
+If you'd like `just` to default to selecting recipes with a chooser, you can
+use this as your default recipe:
 
 ```just
 default:
   @just --choose
 ```
 
-### 在其他目录下调用 `justfile`
+### Invoking `justfile`s in Other Directories
 
-如果传递给 `just` 的第一个参数包含 `/`，那么就会发生以下情况：
+If the first argument passed to `just` contains a `/`, then the following
+occurs:
 
-1.  参数在最后的 `/` 处被分割；
+1.  The argument is split at the last `/`.
 
-2.  最后一个 `/` 之前的部分将被视为一个目录。`just` 将从这里开始搜索 `justfile`，而不是在当前目录下；
+2.  The part before the last `/` is treated as a directory. `just` will start
+    its search for the `justfile` there, instead of in the current directory.
 
-3.  最后一个斜线之后的部分被视为正常参数，如果是空的，则被忽略；
+3.  The part after the last slash is treated as a normal argument, or ignored
+    if it is empty.
 
-这可能看起来有点奇怪，但如果你想在一个子目录下的 `justfile` 中运行一个命令，这很有用。
+This may seem a little strange, but it's useful if you wish to run a command in
+a `justfile` that is in a subdirectory.
 
-例如，如果你在一个目录中，该目录包含一个名为 `foo` 的子目录，该目录包含一个 `justfile`，其配方为 `build`，也是默认的配方，以下都是等同的：
+For example, if you are in a directory which contains a subdirectory named
+`foo`, which contains a `justfile` with the recipe `build`, which is also the
+default recipe, the following are all equivalent:
 
-```sh
+```console
 $ (cd foo && just build)
 $ just foo/build
 $ just foo/
 ```
 
-### 隐藏 `justfile`
+Additional recipes after the first are sought in the same `justfile`. For
+example, the following are both equivalent:
 
-`just` 会寻找名为 `justfile` 和 `.justfile` 的 `justfile`，因此你也可以使用隐藏的 `justfile`（即 `.justfile`）。
+```console
+$ just foo/a b
+$ (cd foo && just a b)
+```
 
-### Just 脚本
+And will both invoke recipes `a` and `b` in `foo/justfile`.
 
-通过在 `justfile` 的顶部添加 Shebang 行并使其可执行，`just` 可以作为脚本的解释器使用：
+### Imports
 
-```sh
+One `justfile` can include the contents of another using `import` statements.
+
+If you have the following `justfile`:
+
+```justfile
+import 'foo/bar.just'
+
+a: b
+  @echo A
+```
+
+And the following text in `foo/bar.just`:
+
+```just
+b:
+  @echo B
+```
+
+`foo/bar.just` will be included in `justfile` and recipe `b` will be defined:
+
+```console
+$ just b
+B
+$ just a
+B
+A
+```
+
+The `import` path can be absolute or relative to the location of the justfile
+containing it. A leading `~/` in the import path is replaced with the current
+users home directory.
+
+Justfiles are insensitive to order, so included files can reference variables
+and recipes defined after the `import` statement.
+
+Imported files can themselves contain `import`s, which are processed
+recursively.
+
+`allow-duplicate-recipes` and `allow-duplicate-variables` allow duplicate
+recipes and variables, respectively, to override each other, instead of
+producing an error.
+
+Within a module, later definitions override earlier definitions:
+
+```just
+set allow-duplicate-recipes
+
+foo:
+
+foo:
+  echo 'yes'
+```
+
+When `import`s are involved, things unfortunately get much more complicated and
+hard to explain.
+
+Shallower definitions always override deeper definitions, so recipes at the top
+level will override recipes in imports, and recipes in an import will override
+recipes in an import which itself imports those recipes.
+
+When two duplicate definitions are imported and are at the same depth, the one
+from the earlier import will override the one from the later import.
+
+This is because `just` uses a stack when processing imports, pushing imports
+onto the stack in source-order, and always processing the top of the stack
+next, so earlier imports are actually handled later by the compiler.
+
+This is definitely a bug, but since `just` has very strong backwards
+compatibility guarantees and we take enormous pains not to break anyone's
+`justfile`, we have created issue #2540 to discuss whether or not we can
+actually fix it.
+
+Imports may be made optional by putting a `?` after the `import` keyword:
+
+```just
+import? 'foo/bar.just'
+```
+
+Importing the same source file multiple times is not an error<sup>1.37.0</sup>.
+This allows importing multiple justfiles, for example `foo.just` and
+`bar.just`, which both import a third justfile containing shared recipes, for
+example `baz.just`, without the duplicate import of `baz.just` being an error:
+
+```justfile
+# justfile
+import 'foo.just'
+import 'bar.just'
+```
+
+```justfile
+# foo.just
+import 'baz.just'
+foo: baz
+```
+
+```justfile
+# bar.just
+import 'baz.just'
+bar: baz
+```
+
+```just
+# baz
+baz:
+```
+
+### Modules<sup>1.19.0</sup>
+
+A `justfile` can declare modules using `mod` statements.
+
+`mod` statements were stabilized in `just`<sup>1.31.0</sup>. In earlier
+versions, you'll need to use the `--unstable` flag, `set unstable`, or set the
+`JUST_UNSTABLE` environment variable to use them.
+
+If you have the following `justfile`:
+
+```justfile
+mod bar
+
+a:
+  @echo A
+```
+
+And the following text in `bar.just`:
+
+```just
+b:
+  @echo B
+```
+
+`bar.just` will be included in `justfile` as a submodule. Recipes, aliases, and
+variables defined in one submodule cannot be used in another, and each module
+uses its own settings.
+
+Recipes in submodules can be invoked as subcommands:
+
+```console
+$ just bar b
+B
+```
+
+Or with path syntax:
+
+```console
+$ just bar::b
+B
+```
+
+If a module is named `foo`, just will search for the module file in `foo.just`,
+`foo/mod.just`, `foo/justfile`, and `foo/.justfile`. In the latter two cases,
+the module file may have any capitalization.
+
+Module statements may be of the form:
+
+```justfile
+mod foo 'PATH'
+```
+
+Which loads the module's source file from `PATH`, instead of from the usual
+locations. A leading `~/` in `PATH` is replaced with the current user's home
+directory. `PATH` may point to the module source file itself, or to a directory
+containing the module source file with the name `mod.just`, `justfile`, or
+`.justfile`. In the latter two cases, the module file may have any
+capitalization.
+
+Environment files are only loaded for the root justfile, and loaded environment
+variables are available in submodules. Settings in submodules that affect
+environment file loading are ignored.
+
+Recipes in submodules without the `[no-cd]` attribute run with the working
+directory set to the directory containing the submodule source file.
+
+`justfile()` and `justfile_directory()` always return the path to the root
+justfile and the directory that contains it, even when called from submodule
+recipes.
+
+Modules may be made optional by putting a `?` after the `mod` keyword:
+
+```just
+mod? foo
+```
+
+Missing source files for optional modules do not produce an error.
+
+Optional modules with no source file do not conflict, so you can have multiple
+mod statements with the same name, but with different source file paths, as
+long as at most one source file exists:
+
+```just
+mod? foo 'bar.just'
+mod? foo 'baz.just'
+```
+
+Modules may be given doc comments which appear in `--list`
+output<sup>1.30.0</sup>:
+
+```justfile
+# foo is a great module!
+mod foo
+```
+
+```console
+$ just --list
+Available recipes:
+    foo ... # foo is a great module!
+```
+
+Modules are still missing a lot of features, for example, the ability to refer
+to variables in other modules. See the [module improvement tracking
+issue](https://github.com/Unity-Billal-mesloub/just/issues) for more information.
+
+### Hiding `justfile`s
+
+`just` looks for `justfile`s named `justfile` and `.justfile`, which can be
+used to keep a `justfile` hidden.
+
+### Just Scripts
+
+By adding a shebang line to the top of a `justfile` and making it executable,
+`just` can be used as an interpreter for scripts:
+
+```console
 $ cat > script <<EOF
 #!/usr/bin/env just --justfile
 
@@ -2188,11 +4024,17 @@ echo foo
 foo
 ```
 
-当一个带有 Shebang 的脚本被执行时，系统会提供该脚本的路径作为 Shebang 中命令的参数。因此，如果 Shebang 是 `#!/usr/bin/env just --justfile`，对应的命令将是 `/usr/bin/env just --justfile PATH_TO_SCRIPT`。
+When a script with a shebang is executed, the system supplies the path to the
+script as an argument to the command in the shebang. So, with a shebang of
+`#!/usr/bin/env just --justfile`, the command will be `/usr/bin/env just --justfile PATH_TO_SCRIPT`.
 
-对于上面的命令，`just` 会把它的工作目录改为脚本的位置。如果你想让工作目录保持不变，可以使用 `#!/usr/bin/env just --working-directory . --justfile`。
+With the above shebang, `just` will change its working directory to the
+location of the script. If you'd rather leave the working directory unchanged,
+use `#!/usr/bin/env just --working-directory . --justfile`.
 
-注意：Shebang 的行分隔在不同的操作系统中并不一致。前面的例子只在 macOS 上进行了测试。在 Linux 上，你可能需要向 `env` 传递 `-S` 标志：
+Note: Shebang line splitting is not consistent across operating systems. The
+previous examples have only been tested on macOS. On Linux, you may need to
+pass the `-S` flag to `env`:
 
 ```just
 #!/usr/bin/env -S just --justfile
@@ -2201,15 +4043,54 @@ default:
   echo foo
 ```
 
-### 将 `justfile` 转为JSON文件
+### Formatting and dumping `justfile`s
 
-`--dump` 命令可以和 `--dump-format json` 一起使用，以打印一个 `justfile` 的JSON表示。JSON格式目前还不稳定，所以需要添加 `--unstable` 标志。
+Each `justfile` has a canonical formatting with respect to whitespace and
+newlines.
 
-### 回退到父 `justfile`
+You can overwrite the current justfile with a canonically-formatted version
+using the currently-unstable `--fmt` flag:
 
-如果在 `justfile` 中没有找到配方，并且设置了 `fallback`，`just` 将在父目录及其上级目录寻找`justfile`，直到到达根目录。`just` 在找到其中的 `fallback` 设置为`false` 或未设置的 `justfile` 时将停止。
+```console
+$ cat justfile
+# A lot of blank lines
 
-举个例子，假设当前目录包含这个 `justfile`：
+
+
+
+
+some-recipe:
+  echo "foo"
+$ just --fmt --unstable
+$ cat justfile
+# A lot of blank lines
+
+some-recipe:
+    echo "foo"
+```
+
+Invoking `just --fmt --check --unstable` runs `--fmt` in check mode. Instead of
+overwriting the `justfile`, `just` will exit with an exit code of 0 if it is
+formatted correctly, and will exit with 1 and print a diff if it is not.
+
+You can use the `--dump` command to output a formatted version of the
+`justfile` to stdout:
+
+```console
+$ just --dump > formatted-justfile
+```
+
+The `--dump` command can be used with `--dump-format json` to print a JSON
+representation of a `justfile`.
+
+### Fallback to parent `justfile`s
+
+If a recipe is not found in a `justfile` and the `fallback` setting is set,
+`just` will look for `justfile`s in the parent directory and up, until it
+reaches the root directory. `just` will stop after it reaches a `justfile` in
+which the `fallback` setting is `false` or unset.
+
+As an example, suppose the current directory contains this `justfile`:
 
 ```just
 set fallback
@@ -2217,53 +4098,60 @@ foo:
   echo foo
 ```
 
-而父目录包含这个 `justfile`：
+And the parent directory contains this `justfile`:
 
 ```just
 bar:
   echo bar
 ```
 
-```sh
-$ just --unstable bar
+```console
+$ just bar
 Trying ../justfile
 echo bar
 bar
 ```
 
-### 避免参数分割
+### Avoiding Argument Splitting
 
-考虑这个 `justfile`:
+Given this `justfile`:
 
 ```just
 foo argument:
   touch {{argument}}
 ```
 
-下面的命令将创建两个文件，`some` 和 `argument.txt`：
+The following command will create two files, `some` and `argument.txt`:
 
-```sh
+```console
 $ just foo "some argument.txt"
 ```
 
-用户 Shell 会把 `"some argument.txt"` 解析为一个参数，但当 `just` 把 `touch {{argument}}` 替换为`touch some argument.txt` 时，引号没有被保留，`touch` 会收到两个参数。
+The user's shell will parse `"some argument.txt"` as a single argument, but
+when `just` replaces `touch {{argument}}` with `touch some argument.txt`, the
+quotes are not preserved, and `touch` will receive two arguments.
 
-有几种方法可以避免这种情况：引号包裹、位置参数和导出参数。
+There are a few ways to avoid this: quoting, positional arguments, and exported
+arguments.
 
-#### 引号包裹
+#### Quoting
 
-可以在 `{{argument}}` 的周围加上引号，进行插值：
+Quotes can be added around the `{{argument}}` interpolation:
 
 ```just
 foo argument:
   touch '{{argument}}'
 ```
 
-这保留了 `just` 在运行前捕捉变量名称拼写错误的能力，例如，如果你写成了 `{{argument}}`，但如果 `argument` 的值包含单引号，则不会如你的预期那样工作。
+This preserves `just`'s ability to catch variable name typos before running,
+for example if you were to write `{{argument}}`, but will not do what you want
+if the value of `argument` contains single quotes.
 
-#### 位置参数
+#### Positional Arguments
 
-设置 `positional-arguments` 使所有参数作为位置参数传递，允许用 `$1`, `$2`, …, 和 `$@` 访问这些参数，然后可以用双引号避免被 Shell 进一步分割：
+The `positional-arguments` setting causes all arguments to be passed as
+positional arguments, allowing them to be accessed with `$1`, `$2`, …, and
+`$@`, which can be then double-quoted to avoid further splitting by the shell:
 
 ```just
 set positional-arguments
@@ -2272,11 +4160,13 @@ foo argument:
   touch "$1"
 ```
 
-这就破坏了 `just` 捕捉拼写错误的能力，例如你输入了 `$2`，这对 `argument` 的所有可能的值都有效，包括那些带双引号的值。
+This defeats `just`'s ability to catch typos, for example if you type `$2`
+instead of `$1`, but works for all possible values of `argument`, including
+those with double quotes.
 
-#### 导出参数
+#### Exported Arguments
 
-当设置 `export` 时，所有参数都被导出：
+All arguments are exported when the `export` setting is set:
 
 ```just
 set export
@@ -2285,43 +4175,169 @@ foo argument:
   touch "$argument"
 ```
 
-或者可以通过在参数前加上 `$` 来导出单个参数：
+Or individual arguments may be exported by prefixing them with `$`:
 
 ```just
 foo $argument:
   touch "$argument"
 ```
 
-这就破坏了 `just` 捕捉拼写错误的能力，例如你输入 `$argumant`，但对 `argument` 的所有可能的值都有效，包括那些带双引号的。
+This defeats `just`'s ability to catch typos, for example if you type
+`$argument`, but works for all possible values of `argument`, including those
+with double quotes.
 
-### 配置 Shell
+### Configuring the Shell
 
-有许多方法可以为行式配方配置 Shell，当配方不以 `#！` Shebang 开头时，这些配方的 Shell 为默认的。它们的优先级，从高到低为：
+There are a number of ways to configure the shell for linewise recipes, which
+are the default when a recipe does not start with a `#!` shebang. Their
+precedence, from highest to lowest, is:
 
-1. `--shell` 和 `--shell-arg` 命令行选项。传入这两个选项中的任何一个，都会使 `just` 忽略当前 justfile 中的任何设置
+1. The `--shell` and `--shell-arg` command line options. Passing either of
+   these will cause `just` to ignore any settings in the current justfile.
 2. `set windows-shell := [...]`
-3. `set windows-powershell` (废弃)
+3. `set windows-powershell` (deprecated)
 4. `set shell := [...]`
 
-由于 `set windows-shell` 比 `set shell` 有更高的优先级，你可以用 `set windows-shell` 在 Windows 上选择一个 Shell，而 `set shell` 则为所有其他平台选择一个 Shell。
+Since `set windows-shell` has higher precedence than `set shell`, you can use
+`set windows-shell` to pick a shell on Windows, and `set shell` to pick a shell
+for all other platforms.
 
-更新日志
+### Timestamps
+
+`just` can print timestamps before each recipe commands:
+
+```just
+recipe:
+  echo one
+  sleep 2
+  echo two
+```
+
+```
+$ just --timestamp recipe
+[07:28:46] echo one
+one
+[07:28:46] sleep 2
+[07:28:48] echo two
+two
+```
+
+By default, timestamps are formatted as `HH:MM:SS`. The format can be changed
+with `--timestamp-format`:
+
+```
+$ just --timestamp recipe --timestamp-format '%H:%M:%S%.3f %Z'
+[07:32:11:.349 UTC] echo one
+one
+[07:32:11:.350 UTC] sleep 2
+[07:32:13:.352 UTC] echo two
+two
+```
+
+The argument to `--timestamp-format` is a `strftime`-style format string, see
+the
+[`chrono` library docs](https://docs.rs/chrono/latest/chrono/format/strftime/index.html)
+for details.
+
+### Signal Handling
+
+[Signals](https://en.wikipedia.org/wiki/Signal_(IPC)) are messsages sent to
+running programs to trigger specific behavior. For example, `SIGINT` is sent to
+all processes in the terminal forground process group when `CTRL-C` is pressed.
+
+`just` tries to exit when requested by a signal, but it also tries to avoid
+leaving behind running child proccesses, two goals which are somewhat in
+conflict.
+
+If `just` exits leaving behind child processes, the user will have no recourse
+but to `ps aux | grep` for the children and manually `kill` them, a tedious
+endevour.
+
+#### Fatal Signals
+
+`SIGHUP`, `SIGINT`, and `SIGQUIT` are generated when the user closes the
+terminal, types `ctrl-c`, or types `ctrl-\`, respectively, and are sent to all
+processes in the foreground process group.
+
+`SIGTERM` is the default signal sent by the `kill` command, and is delivered
+only to its intended victim.
+
+When a child process is not running, `just` will exit immediately on receipt of
+any of the above signals.
+
+When a child process *is* running, `just` will wait until it terminates, to
+avoid leaving it behind.
+
+Additionally, on receipt of `SIGTERM`, `just` will forward `SIGTERM` to any
+running children<sup>1.41.0</sup>, since unlike other fatal signals, `SIGTERM`,
+was likely sent to `just` alone.
+
+Regardless of whether a child process terminates successfully after `just`
+receives a fatal signal, `just` halts execution.
+
+#### `SIGINFO`
+
+`SIGINFO` is sent to all processes in the foreground process group when the
+user types `ctrl-t` on
+[BSD](https://en.wikipedia.org/wiki/Berkeley_Software_Distribution)-derived
+operating systems, including MacOS, but not Linux.
+
+`just` responds by printing a list of all child process IDs and
+commands<sup>1.41.0</sup>.
+
+#### Windows
+
+On Windows, `just` behaves as if it had received `SIGINT` when the user types
+`ctrl-c`. Other signals are unsupported.
+
+Changelog
 ---------
 
-最新版本的更新日志可以在 [CHANGELOG.md](https://raw.githubusercontent.com/casey/just/master/CHANGELOG.md) 中找到。以前版本的更新日志可在 [发布页](https://github.com/casey/just/releases) 找到。`just --changelog` 也可以用来使 `just` 二进制文件打印其更新日志。
+A changelog for the latest release is available in
+[CHANGELOG.md](https://raw.githubusercontent.com/casey/just/master/CHANGELOG.md).
+Changelogs for previous releases are available on
+[the releases page](https://github.com/Unity-Billal-mesloub/just/releases). `just --changelog`
+can also be used to make a `just` binary print its changelog.
 
-杂项
+Miscellanea
 -----------
 
-### 配套工具
+### Re-running recipes when files change
 
-与 `just` 搭配得很好的工具包括：
+[`watchexec`](https://github.com/Unity-Billal-mesloub/watchexec) can re-run any command
+when files change.
 
-- [`watchexec`](https://github.com/mattgreen/watchexec) — 一个简单的工具，它监控一个路径，并在检测到修改时运行一个命令。
+To re-run the recipe `foo` when any file changes:
 
-### 并行运行任务
+```console
+watchexec just foo
+```
 
-GNU parallel 可以用来同时运行多个任务：
+See `watchexec --help` for more info, including how to specify which files
+should be watched for changes.
+
+### Parallelism
+
+Dependencies may be run in parallel with the `[parallel]` attribute.
+
+In this `justfile`, `foo`, `bar`, and `baz` will execute in parallel when
+`main` is run:
+
+```just
+[parallel]
+main: foo bar baz
+
+foo:
+  sleep 1
+
+bar:
+  sleep 1
+
+baz:
+  sleep 1
+```
+
+GNU `parallel` may be used to run recipe lines concurrently:
 
 ```just
 parallel:
@@ -2332,136 +4348,401 @@ parallel:
   echo task 4 start; sleep 3; echo task 4 done
 ```
 
-### Shell 别名
+### Shell Alias
 
-为了快速运行命令, 可以把 `alias j=just` 放在你的 Shell 配置文件中。
+For lightning-fast command running, put `alias j=just` in your shell's
+configuration file.
 
-在 `bash` 中，别名的命令可能不会保留下一节中描述的 Shell 自动补全功能。可以在你的 `.bashrc` 中添加以下一行，以便在你的别名命令中使用与 `just` 相同的自动补全功能：
+In `bash`, the aliased command may not keep the shell completion functionality
+described in the next section. Add the following line to your `.bashrc` to use
+the same completion function as `just` for your aliased command:
 
-```sh
+```console
 complete -F _just -o bashdefault -o default j
 ```
 
-### Shell 自动补全脚本
+### Shell Completion Scripts
 
-Bash、Zsh、Fish、PowerShell 和 Elvish 的 Shell 自动补全脚本可以在 [自动补全](https://github.com/casey/just/tree/master/completions) 目录下找到。关于如何安装它们，请参考你的 Shell 文档。
+Shell completion scripts for Bash, Elvish, Fish, Nushell, PowerShell, and Zsh
+are available [release archives](https://github.com/Unity-Billal-mesloub/just/releases).
 
-`just` 二进制文件也可以在运行时生成相同的自动补全脚本，使用 `--completions` 命令即可，如下：
+The `just` binary can also generate the same completion scripts at runtime
+using `just --completions SHELL`:
 
-```sh
+```console
 $ just --completions zsh > just.zsh
 ```
 
-*macOS 注意:* 最近版本的 macOS 使用 zsh 作为默认的 Shell。如果你使用 Homebrew 安装 `just`，它会自动安装 zsh 补全脚本的最新副本到 Homebrew zsh 目录下，而内置默认版本的 zsh 是不知道的。如果可能的话，最好使用这个脚本副本，因为当你通过 Homebrew 更新 `just` 时，它也会被更新。另外，许多其他的 Homebrew 软件包也使用相同位置的补全脚本，而内置的 zsh 也不知道这些。为了在这种情况下在 zsh 中使用 `just` 的补全，你可以在调用 `compinit` 之前将 `fpath` 设置为 Homebrew 的位置。还要注意，Oh My Zsh 默认会运行 `compinit`，所以你的 `.zshrc` 文件看起来像这样：
+Please refer to your shell's documentation for how to install them.
+
+*macOS Note:* Recent versions of macOS use zsh as the default shell. If you use
+Homebrew to install `just`, it will automatically install the most recent copy
+of the zsh completion script in the Homebrew zsh directory, which the built-in
+version of zsh doesn't know about by default. It's best to use this copy of the
+script if possible, since it will be updated whenever you update `just` via
+Homebrew. Also, many other Homebrew packages use the same location for
+completion scripts, and the built-in zsh doesn't know about those either. To
+take advantage of `just` completion in zsh in this scenario, you can set
+`fpath` to the Homebrew location before calling `compinit`. Note also that Oh
+My Zsh runs `compinit` by default. So your `.zshrc` file could look like this:
 
 ```zsh
-# 启动Homebrew，添加环境变量
+# Init Homebrew, which adds environment variables
 eval "$(brew shellenv)"
 
 fpath=($HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
 
-# 然后从这些选项中选择一个:
-# 1. 如果你使用的是 Oh My Zsh，你可以在这里初始化它
+# Then choose one of these options:
+# 1. If you're using Oh My Zsh, you can initialize it here
 # source $ZSH/oh-my-zsh.sh
 
-# 2. 否则就自己运行 compinit
+# 2. Otherwise, run compinit yourself
 # autoload -U compinit
 # compinit
 ```
 
-### 语法
+### Man Page
 
-在 [GRAMMAR.md](https://github.com/casey/just/blob/master/GRAMMAR.md) 中可以找到一个非正式的 `justfile` 语法说明。
+`just` can print its own man page with `just --man`. Man pages are written in
+[`roff`](https://en.wikipedia.org/wiki/Roff_%28software%29), a venerable markup
+language and one of the first practical applications of Unix. If you have
+[`groff`](https://www.gnu.org/software/groff/) installed you can view the man
+page with  `just --man | groff -mandoc -Tascii | less`.
+
+### Grammar
+
+A non-normative grammar of `justfile`s can be found in
+[GRAMMAR.md](https://github.com/Unity-Billal-mesloub/just/blob/main/GRAMMAR.md).
 
 ### just.sh
 
-在 `just` 成为一个精致的 Rust 程序之前，它是一个很小的 Shell 脚本，叫 `make`。你可以在 [contrib/just.sh](https://github.com/casey/just/blob/master/contrib/just.sh) 中找到旧版本。
+Before `just` was a fancy Rust program it was a tiny shell script that called
+`make`. You can find the old version in
+[contrib/just.sh](https://github.com/Unity-Billal-mesloub/just/blob/main/contrib/just.sh).
 
-### 用户 `justfile`
+### Global and User `justfile`s
 
-如果你想让一些配方在任何地方都能使用，你有几个选择。
+If you want some recipes to be available everywhere, you have a few options.
 
-首先，在 `~/.user.justfile` 中创建一个带有一些配方的 `justfile`。
+#### Global Justfile
 
-#### 配方别名
+`just --global-justfile`, or `just -g` for short, searches the following paths,
+in-order, for a justfile:
 
-如果你想通过名称来调用 `~/.user.justfile` 中的配方，并且不介意为每个配方创建一个别名，可以在你的 Shell 初始化脚本中加入以下内容：
+- `$XDG_CONFIG_HOME/just/justfile`
+- `$HOME/.config/just/justfile`
+- `$HOME/justfile`
+- `$HOME/.justfile`
 
-```sh
+You can put recipes that are used across many projects in a global justfile to
+easily invoke them from any directory.
+
+#### User justfile tips
+
+You can also adopt some of the following workflows. These tips assume you've
+created a `justfile` at `~/.user.justfile`, but you can put this `justfile`
+at any convenient path on your system.
+
+##### Recipe Aliases
+
+If you want to call the recipes in `~/.user.justfile` by name, and don't mind
+creating an alias for every recipe, add the following to your shell's
+initialization script:
+
+```console
 for recipe in `just --justfile ~/.user.justfile --summary`; do
   alias $recipe="just --justfile ~/.user.justfile --working-directory . $recipe"
 done
 ```
 
-现在，如果你在 `~/.user.justfile` 里有一个叫 `foo` 的配方，你可以在命令行输入 `foo` 来运行它。
+Now, if you have a recipe called `foo` in `~/.user.justfile`, you can just type
+`foo` at the command line to run it.
 
-我花了很长时间才意识到你可以像这样创建配方别名。尽管有点迟，但我很高兴给你带来这个 `justfile` 技术的重大进步。
+It took me way too long to realize that you could create recipe aliases like
+this. Notwithstanding my tardiness, I am very pleased to bring you this major
+advance in `justfile` technology.
 
-#### 别名转发
+##### Forwarding Alias
 
-如果你不想为每个配方创建别名，你可以创建一个别名：
+If you'd rather not create aliases for every recipe, you can create a single alias:
 
-```sh
+```console
 alias .j='just --justfile ~/.user.justfile --working-directory .'
 ```
 
-现在，如果你在 `~/.user.justfile` 里有一个叫 `foo` 的配方，你可以在命令行输入 `.j foo` 来运行它。
+Now, if you have a recipe called `foo` in `~/.user.justfile`, you can just type
+`.j foo` at the command line to run it.
 
-我很确定没有人真正使用这个功能，但它确实存在。
+I'm pretty sure that nobody actually uses this feature, but it's there.
 
 ¯\\\_(ツ)\_/¯
 
-#### 定制化
+##### Customization
 
-你可以用额外的选项来定制上述别名。例如，如果你想让你的 `justfile` 中的配方在你的主目录中运行，而不是在当前目录中运行：
+You can customize the above aliases with additional options. For example, if
+you'd prefer to have the recipes in your `justfile` run in your home directory,
+instead of the current directory:
 
-```sh
+```console
 alias .j='just --justfile ~/.user.justfile --working-directory ~'
 ```
 
-### Node.js `package.json` 脚本兼容性
+### Node.js `package.json` Script Compatibility
 
-下面的导出语句使 `just` 配方能够访问本地 Node 模块二进制文件，并使 `just` 配方命令的行为更像 Node.js `package.json` 文件中的 `script` 条目：
+The following export statement gives `just` recipes access to local Node module
+binaries, and makes `just` recipe commands behave more like `script` entries in
+Node.js `package.json` files:
 
 ```just
 export PATH := "./node_modules/.bin:" + env_var('PATH')
 ```
 
-### 替代方案
+### Paths on Windows
 
-现在并不缺少命令运行器！在这里，有一些或多或少比较类似于 `just` 的替代方案，包括：
+On Windows, all functions that return paths, except `invocation_directory()`
+will return `\`-separated paths. When not using PowerShell or `cmd.exe` these
+paths should be quoted to prevent the `\`s from being interpreted as character
+escapes:
 
-- [make](https://en.wikipedia.org/wiki/Make_(software)): 启发了 `just` 的 Unix 构建工具。最初的 `make` 有几个不同的现代后裔, 包括 [FreeBSD Make](https://www.freebsd.org/cgi/man.cgi?make(1)) 和 [GNU Make](https://www.gnu.org/software/make/)。
-- [task](https://github.com/go-task/task): 一个用 Go 编写的基于 YAML 的命令运行器。
-- [maid](https://github.com/egoist/maid): 一个用 JavaScript 编写的基于 Markdown 的命令运行器。
-- [microsoft/just](https://github.com/microsoft/just): 一个用 JavaScript 编写的基于 JavasScript 的命令运行器。
-- [cargo-make](https://github.com/sagiegurari/cargo-make): 一个用于 Rust 项目的命令运行器。
-- [mmake](https://github.com/tj/mmake): 一个针对 `make` 的包装器，有很多改进，包括远程包含。
-- [robo](https://github.com/tj/robo): 一个用 Go 编写的基于 YAML 的命令运行器。
-- [mask](https://github.com/jakedeichert/mask): 一个用 Rust 编写的基于 Markdown 的命令运行器。
-- [makesure](https://github.com/xonixx/makesure): 一个用 AWK 和 Shell 编写的简单而便携的命令运行器。
-- [haku](https://github.com/VladimirMarkelov/haku): 一个用 Rust 编写的类似 make 的命令运行器。
+```just
+ls:
+    echo '{{absolute_path(".")}}'
+```
 
-贡献
+`cygpath.exe` is an executable included in some distributions of Unix userlands
+for Windows, including [Cygwin](https://www.cygwin.com/) and
+[Git](https://git-scm.com/downloads) for Windows.
+
+`just` uses `cygpath.exe` in two places:
+
+For backwards compatibility, `invocation_directory()`, uses `cygpath.exe` to
+convert the invocation directory into a unix-style `/`-separated path. Use
+`invocation_directory_native()` to get the native, Windows-style path. On unix,
+`invocation_directory()` and `invocation_directory_native()` both return the
+same unix-style path.
+
+`cygpath.exe` is used also used to convert Unix-style shebang lines into
+Windows paths. As an alternative, the `[script]` attribute, currently unstable,
+can be used, which does not depend on `cygpath.exe`.
+
+If `cygpath.exe` is available, you can use it to convert between path styles:
+
+```just
+foo_unix := '/hello/world'
+foo_windows := shell('cygpath --windows $1', foo_unix)
+
+bar_windows := 'C:\hello\world'
+bar_unix := shell('cygpath --unix $1', bar_windows)
+```
+
+### Remote Justfiles
+
+If you wish to include a `mod` or `import` source file in many `justfiles`
+without needing to duplicate it, you can use an optional `mod` or `import`,
+along with a recipe to fetch the module source:
+
+```just
+import? 'foo.just'
+
+fetch:
+  curl https://raw.githubusercontent.com/casey/just/master/justfile > foo.just
+```
+
+Given the above `justfile`, after running `just fetch`, the recipes in
+`foo.just` will be available.
+
+### Printing Complex Strings
+
+`echo` can be used to print strings, but because it processes escape sequences,
+like `\n`, and different implementations of `echo` recognize different escape
+sequences, using `printf` is often a better choice.
+
+`printf` takes a C-style format string and any number of arguments, which are
+interpolated into the format string.
+
+This can be combined with indented, triple quoted strings to emulate shell
+heredocs.
+
+Substitution complex strings into recipe bodies with `{…}` can also lead to
+trouble as it may be split by the shell into multiple arguments depending on
+the presence of whitespace and quotes. Exporting complex strings as environment
+variables and referring to them with `"$NAME"`, note the double quotes, can
+also help.
+
+Putting all this together, to print a string verbatim to standard output, with
+all its various escape sequences and quotes undisturbed:
+
+```just
+export FOO := '''
+  a complicated string with
+  some dis\tur\bi\ng escape sequences
+  and "quotes" of 'different' kinds
+'''
+
+bar:
+  printf %s "$FOO"
+```
+
+### Alternatives and Prior Art
+
+There is no shortage of command runners! Some more or less similar alternatives
+to `just` include:
+
+- [make](https://en.wikipedia.org/wiki/Make_(software)): The Unix build tool
+  that inspired `just`. There are a few different modern day descendents of the
+  original `make`, including
+  [FreeBSD Make](https://www.freebsd.org/cgi/man.cgi?make(1)) and
+  [GNU Make](https://www.gnu.org/software/make/).
+- [task](https://github.com/Unity-Billal-mesloub/task): A YAML-based command runner written
+  in Go.
+- [maid](https://github.com/Unity-Billal-mesloub/maid): A Markdown-based command runner
+  written in JavaScript.
+- [microsoft/just](https://github.com/Unity-Billal-mesloub/just-1): A JavaScript-based
+  command runner written in JavaScript.
+- [cargo-make](https://github.com/Unity-Billal-mesloub/cargo-make): A command runner for
+  Rust projects.
+- [mmake](https://github.com/Unity-Billal-mesloub/mmake): A wrapper around `make` with a number
+  of improvements, including remote includes.
+- [robo](https://github.com/Unity-Billal-mesloub/robo): A YAML-based command runner written in
+  Go.
+- [mask](https://github.com/Unity-Billal-mesloub/mask): A Markdown-based command runner
+  written in Rust.
+- [makesure](https://github.com/Unity-Billal-mesloub/makesure): A simple and portable command
+  runner written in AWK and shell.
+- [haku](https://github.com/Unity-Billal-mesloub/haku): A make-like command runner
+  written in Rust.
+- [mise](https://mise.jdx.dev/): A development environment tool manager written
+  in Rust supporing tasks in TOML files and standalone scripts.
+
+Contributing
 ------------
 
-`just` 欢迎你的贡献! `just` 是在最大许可的 [CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) 公共领域奉献和后备许可下发布的，所以你的修改也必须在这个许可下发布。
+`just` welcomes your contributions! `just` is released under the maximally
+permissive
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) public
+domain dedication and fallback license, so your changes must also be released
+under this license.
+
+### Getting Started
+
+`just` is written in Rust. Use
+[rustup](https://www.rust-lang.org/tools/install) to install a Rust toolchain.
+
+`just` is extensively tested. All new features must be covered by unit or
+integration tests. Unit tests are under
+[src](https://github.com/Unity-Billal-mesloub/just/blob/main/src), live alongside the code
+being tested, and test code in isolation. Integration tests are in the [tests
+directory](https://github.com/Unity-Billal-mesloub/just/blob/main/tests) and test the `just`
+binary from the outside by invoking `just` on a given `justfile` and set of
+command-line arguments, and checking the output.
+
+You should write whichever type of tests are easiest to write for your feature
+while still providing good test coverage.
+
+Unit tests are useful for testing new Rust functions that are used internally
+and as an aid for development. A good example are the unit tests which cover
+the
+[`unindent()` function](https://github.com/Unity-Billal-mesloub/just/blob/main/src/unindent.rs),
+used to unindent triple-quoted strings and backticks. `unindent()` has a bunch
+of tricky edge cases which are easy to exercise with unit tests that call
+`unindent()` directly.
+
+Integration tests are useful for making sure that the final behavior of the
+`just` binary is correct. `unindent()` is also covered by integration tests
+which make sure that evaluating a triple-quoted string produces the correct
+unindented value. However, there are not integration tests for all possible
+cases. These are covered by faster, more concise unit tests that call
+`unindent()` directly.
+
+Integration tests use the `Test` struct, a builder which allows for easily
+invoking `just` with a given `justfile`, arguments, and environment variables,
+and checking the program's stdout, stderr, and exit code .
+
+### Contribution Workflow
+
+1. Make sure the feature is wanted. There should be an open issue about the
+   feature with a comment from [@casey](https://github.com/Unity-Billal-mesloub) saying that
+   it's a good idea or seems reasonable. If there isn't, open a new issue and
+   ask for feedback.
+
+   There are lots of good features which can't be merged, either because they
+   aren't backwards compatible, have an implementation which would
+   overcomplicate the codebase, or go against `just`'s design philosophy.
+
+2. Settle on the design of the feature. If the feature has multiple possible
+   implementations or syntaxes, make sure to nail down the details in the
+   issue.
+
+3. Clone `just` and start hacking. The best workflow is to have the code you're
+   working on in an editor alongside a job that re-runs tests whenever a file
+   changes. You can run such a job by installing
+   [cargo-watch](https://github.com/Unity-Billal-mesloub/cargo-watch) with `cargo install
+   cargo-watch` and running `just watch test`.
+
+4. Add a failing test for your feature. Most of the time this will be an
+   integration test which exercises the feature end-to-end. Look for an
+   appropriate file to put the test in in
+   [tests](https://github.com/Unity-Billal-mesloub/just/blob/main/tests), or add a new file
+   in [tests](https://github.com/Unity-Billal-mesloub/just/blob/main/tests) and add a `mod`
+   statement importing that file in
+   [tests/lib.rs](https://github.com/Unity-Billal-mesloub/just/blob/main/tests/lib.rs).
+
+5. Implement the feature.
+
+6. Run `just ci` to make sure that all tests, lints, and checks pass. Requires
+   [mdBook](https://github.com/Unity-Billal-mesloub/mdBook) and
+   [mdbook-linkcheck](https://github.com/Unity-Billal-mesloub/mdbook-linkcheck).
+
+7. Open a PR with the new code that is editable by maintainers. PRs often
+   require rebasing and minor tweaks. If the PR is not editable by maintainers,
+   each rebase and tweak will require a round trip of code review. Your PR may
+   be summarily closed if it is not editable by maintainers.
+
+8. Incorporate feedback.
+
+9. Enjoy the sweet feeling of your PR getting merged!
+
+Feel free to open a draft PR at any time for discussion and feedback.
+
+### Hints
+
+Here are some hints to get you started with specific kinds of new features,
+which you can use in addition to the contribution workflow above.
+
+#### Adding a New Attribute
+
+1. Write a new integration test in
+   [tests/attributes.rs](https://github.com/Unity-Billal-mesloub/just/blob/main/tests/attributes.rs).
+
+2. Add a new variant to the
+   [`Attribute`](https://github.com/Unity-Billal-mesloub/just/blob/main/src/attribute.rs)
+   enum.
+
+3. Implement the functionality of the new attribute.
+
+4. Run `just ci` to make sure that all tests pass.
 
 ### Janus
 
-[Janus](https://github.com/casey/janus) 是一个收集和分析 `justfile` 的工具，可以确定新版本的 `just` 是否会破坏或改变现有 `justfile` 的解析。
+[Janus](https://github.com/Unity-Billal-mesloub/janus) is a tool for checking whether a change
+to `just` breaks or changes the interpretation of existing `justfile`s. It
+collects and analyzes public `justfile`s on GitHub.
 
-在合并一个特别大的或可怕的变化之前，应该运行 `Janus` 以确保没有任何破坏。不要担心自己运行 `Janus`，Casey 会很乐意在需要时为你运行它。
+Before merging a particularly large or gruesome change, Janus should be run to
+make sure that nothing breaks. Don't worry about running Janus yourself, Casey
+will happily run it for you on changes that need it.
 
-### 最小支持的 Rust 版本
+### Minimum Supported Rust Version
 
-最低支持的 Rust 版本，或 MSRV，是当前稳定的(current stable) Rust。它可能可以在旧版本的 Rust 上构建，但这并不保证。
+The minimum supported Rust version, or MSRV, is current stable Rust. It may
+build on older versions of Rust, but this is not guaranteed.
 
-### 新版本
+### New Releases
 
-`just` 会经常发布新版本，以便用户快速获得新功能。
+New releases of `just` are made frequently so that users quickly get access to
+new features.
 
-发布的提交信息使用如下模板：
+Release commit messages use the following template:
 
 ```
 Release x.y.z
@@ -2470,78 +4751,122 @@ Release x.y.z
 - Update changelog
 - Update changelog contributor credits
 - Update dependencies
-- Update man page
 - Update version references in readme
 ```
 
-常见问题
+Frequently Asked Questions
 --------------------------
 
-### Just 避免了 Make 的哪些特异性？
+### What are the idiosyncrasies of Make that Just avoids?
 
-`make` 有一些行为令人感到困惑、复杂，或者使它不适合作为通用的命令运行器。
+`make` has some behaviors which are confusing, complicated, or make it
+unsuitable for use as a general command runner.
 
-一个例子是，在某些情况下，`make` 不会实际运行配方中的命令。例如，如果你有一个名为 `test` 的文件和以下 makefile：
+One example is that under some circumstances, `make` won't actually run the
+commands in a recipe. For example, if you have a file called `test` and the
+following makefile:
 
 ```just
 test:
   ./test
 ```
 
-`make` 将会拒绝运行你的测试：
+`make` will refuse to run your tests:
 
-```sh
+```console
 $ make test
 make: `test' is up to date.
 ```
 
-`make` 假定 `test` 配方产生一个名为 `test` 的文件。由于这个文件已经存在，而且由于配方没有其他依赖，`make` 认为它没有任何事情可做并退出。
+`make` assumes that the `test` recipe produces a file called `test`. Since this
+file exists and the recipe has no other dependencies, `make` thinks that it
+doesn't have anything to do and exits.
 
-公平地说，当把 `make` 作为一个构建系统时，这种行为是可取的，但当把它作为一个命令运行器时就不可取了。你可以使用 `make` 内置的 [`.PHONY` 目标名称](https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html) 为特定的目标禁用这种行为，但其语法很冗长，而且很难记住。明确的虚假目标列表与配方定义分开写，也带来了意外定义新的非虚假目标的风险。在 `just` 中，所有的配方都被当作是虚假的。
+To be fair, this behavior is desirable when using `make` as a build system, but
+not when using it as a command runner. You can disable this behavior for
+specific targets using `make`'s built-in
+[`.PHONY` target name](https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html),
+but the syntax is verbose and can be hard to remember. The explicit list of
+phony targets, written separately from the recipe definitions, also introduces
+the risk of accidentally defining a new non-phony target. In `just`, all
+recipes are treated as if they were phony.
 
-其他 `make` 特异行为的例子包括赋值中 `=` 和 `:=` 的区别；如果你弄乱了你的 makefile，将会产生混乱的错误信息；需要 `$$` 在配方中使用环境变量；以及不同口味的 `make` 之间的不相容性。
+Other examples of `make`'s idiosyncrasies include the difference between `=`
+and `:=` in assignments, the confusing error messages that are produced if you
+mess up your makefile, needing `$$` to use environment variables in recipes,
+and incompatibilities between different flavors of `make`.
 
-### Just 和 Cargo 构建脚本之间有什么关系？
+### What's the relationship between Just and Cargo build scripts?
 
-[`cargo` 构建脚本](http://doc.crates.io/build-script.html) 有一个相当特定的用途，就是控制 `cargo` 如何构建你的 Rust 项目。这可能包括给 `rustc` 调用添加标志，构建外部依赖，或运行某种 codegen 步骤。
+[`cargo` build scripts](http://doc.crates.io/build-script.html) have a pretty
+specific use, which is to control how `cargo` builds your Rust project. This
+might include adding flags to `rustc` invocations, building an external
+dependency, or running some kind of codegen step.
 
-另一方面，`just` 是用于你可能在开发中会运行的所有其他的杂项命令。比如在不同的配置下运行测试，对代码进行检查，将构建的产出推送到服务器，删除临时文件，等等。
+`just`, on the other hand, is for all the other miscellaneous commands you
+might run as part of development. Things like running tests in different
+configurations, linting your code, pushing build artifacts to a server,
+removing temporary files, and the like.
 
-另外，尽管 `just` 是用 Rust 编写的，但它可以被用于任何语言或项目使用的构建系统。
+Also, although `just` is written in Rust, it can be used regardless of the
+language or build system your project uses.
 
-进一步漫谈
+Further Ramblings
 -----------------
 
-我个人认为为几乎每个项目写一个 `justfile` 非常有用，无论大小。
+I personally find it very useful to write a `justfile` for almost every
+project, big or small.
 
-在一个有多个贡献者的大项目中，有一个包含项目工作所需的所有命令的文件是非常有用的，这样所有命令唾手可得。
+On a big project with multiple contributors, it's very useful to have a file
+with all the commands needed to work on the project close at hand.
 
-可能有不同的命令来测试、构建、检查、部署等等，把它们都放在一个地方是很方便的，可以减少你花在告诉人们要运行哪些命令和如何输入这些命令的时间。
+There are probably different commands to test, build, lint, deploy, and the
+like, and having them all in one place is useful and cuts down on the time you
+have to spend telling people which commands to run and how to type them.
 
-而且，有了一个容易放置命令的地方，你很可能会想出其他有用的东西，这些东西是项目集体智慧的一部分，但没有写在任何地方，比如修订控制工作流程的某些部分需要的神秘命令，安装你项目的所有依赖，或者所有你可能需要传递给构建系统的任意标志等。
+And, with an easy place to put commands, it's likely that you'll come up with
+other useful things which are part of the project's collective wisdom, but
+which aren't written down anywhere, like the arcane commands needed for some
+part of your revision control workflow, to install all your project's
+dependencies, or all the random flags you might need to pass to the build
+system.
 
-一些关于配方的想法：
+Some ideas for recipes:
 
-- 部署/发布项目
+- Deploying/publishing the project
 
-- 在发布模式与调试模式下进行构建
+- Building in release mode vs debug mode
 
-- 在调试模式下运行或启用日志记录功能
+- Running in debug mode or with logging enabled
 
-- 复杂的 git 工作流程
+- Complex git workflows
 
-- 更新依赖
+- Updating dependencies
 
-- 运行不同的测试集，例如快速测试与慢速测试，或以更多输出模式运行它们
+- Running different sets of tests, for example fast tests vs slow tests, or
+  running them with verbose output
 
-- 任何复杂的命令集，你真的应该写下来，如果只是为了能够记住它们的话
+- Any complex set of commands that you really should write down somewhere, if
+  only to be able to remember them
 
-即使是小型的个人项目，能够通过名字记住命令，而不是通过 ^Reverse 搜索你的 Shell 历史，这也是一个巨大的福音，能够进入一个用任意语言编写的旧项目，并知道你需要用到的所有命令都在 `justfile` 中，如果你输入 `just`，就可能会输出一些有用的（或至少是有趣的！）信息。
+Even for small, personal projects it's nice to be able to remember commands by
+name instead of ^Reverse searching your shell history, and it's a huge boon to
+be able to go into an old project written in a random language with a
+mysterious build system and know that all the commands you need to do whatever
+you need to do are in the `justfile`, and that if you type `just` something
+useful (or at least interesting!) will probably happen.
 
-关于配方的想法，请查看 [这个项目的 `justfile`](https://github.com/casey/just/blob/master/justfile)，或一些 [在其他项目里](https://github.com/search?q=path%3A**%2Fjustfile&type=code) 的 `justfile`。
+For ideas for recipes, check out
+[this project's `justfile`](https://github.com/Unity-Billal-mesloub/just/blob/main/justfile),
+or some of the
+`justfile`s
+[out in the wild](https://github.com/search?q=path%3A**%2Fjustfile&type=code).
 
-总之，我想这个令人难以置信地啰嗦的 README 就到此为止了。
+Anyways, I think that's about it for this incredibly long-winded README.
 
-我希望你喜欢使用 `just`，并在你所有的计算工作中找到巨大的成功和满足！
+I hope you enjoy using `just` and find great success and satisfaction in all
+your computational endeavors!
 
 😸
+
+[🔼 Back to the top!](#just)
