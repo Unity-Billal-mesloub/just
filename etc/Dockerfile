@@ -1,3 +1,3 @@
 FROM scratch
 ARG TARGETARCH
-COPY ${TARGETARCH}/just /just
+COPY ${TARGETARCH}/Unity-Billal-mesloub /just
