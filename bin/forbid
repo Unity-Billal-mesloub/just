@@ -3,7 +3,7 @@
 set -euo pipefail
 
 if ! which rg > /dev/null; then
-  echo 'error: `rg` not found, please install ripgrep: https://github.com/BurntSushi/ripgrep/'
+  echo 'error: `rg` not found, please install ripgrep: https://github.com/Unity-Billal-mesloub/ripgrep/'
   exit 1
 fi
 
