@@ -7,7 +7,7 @@ title = "Just Programmer's Manual"
 build-dir = "build"
 
 [output.html]
-git-repository-url = "https://github.com/casey/just"
+git-repository-url = "https://github.com/Unity-Billal-mesloub/just"
 site-url = "/man/en/"
 
 [output.linkcheck]
