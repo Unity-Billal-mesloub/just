@@ -7,7 +7,7 @@ title = "Just 用户指南"
 build-dir = "build"
 
 [output.html]
-git-repository-url = "https://github.com/casey/just"
+git-repository-url = "https://github.com/Unity-Billal-mesloub/just"
 site-url = "/man/zh/"
 
 [output.linkcheck]
